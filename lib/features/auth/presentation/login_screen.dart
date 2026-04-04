@@ -1,0 +1,461 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kaamsathi/l10n/app_localizations.dart';
+
+import '../../../core/router/app_paths.dart';
+import '../../../core/router/route_names.dart';
+import '../../../core/session/auth_session_notifier.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../data/auth_api.dart';
+import '../data/auth_api_provider.dart';
+import 'widgets/auth_shell.dart';
+
+enum _AuthMethod { phone, email }
+
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
+
+  static const String name = RouteNames.login;
+
+  @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _phoneOtp = TextEditingController();
+  final TextEditingController _otpEmail = TextEditingController();
+  final TextEditingController _otp = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _loginPhone = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  _AuthMethod _method = _AuthMethod.email;
+  bool _codeSent = false;
+  bool _submitting = false;
+  String? _otpSentPhoneE164;
+  String? _otpSentEmail;
+
+  @override
+  void dispose() {
+    _phoneOtp.dispose();
+    _otpEmail.dispose();
+    _otp.dispose();
+    _email.dispose();
+    _loginPhone.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  String? _validatePhoneDigits(String? v, AppLocalizations l10n) {
+    final String t = (v ?? '').trim().replaceAll(RegExp(r'\s'), '');
+    if (t.isEmpty) {
+      return null;
+    }
+    if (t.length < 10) {
+      return l10n.authErrorPhoneInvalid;
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? v, AppLocalizations l10n) {
+    final String t = (v ?? '').trim();
+    if (t.isEmpty) {
+      return null;
+    }
+    if (!t.contains('@')) {
+      return l10n.authErrorEmailInvalid;
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? v, AppLocalizations l10n) {
+    if ((v ?? '').length < 6) {
+      return l10n.authErrorPasswordShort;
+    }
+    return null;
+  }
+
+  void _showAuthError(Object e, AppLocalizations l10n) {
+    final String msg =
+        e is AuthApiException ? e.message : l10n.authErrorNetwork;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  /// Returns `(phoneE164, email)` with at least one non-null for send OTP.
+  (String?, String?) _otpIdentifiersOrThrow(AppLocalizations l10n) {
+    final String phoneRaw = _phoneOtp.text.trim();
+    final String emailRaw = _otpEmail.text.trim();
+    final String? emailErr = _validateEmail(_otpEmail.text, l10n);
+    final String? phoneErr =
+        phoneRaw.isEmpty ? null : _validatePhoneDigits(_phoneOtp.text, l10n);
+
+    if (phoneRaw.isNotEmpty && phoneErr != null) {
+      throw AuthApiException(phoneErr);
+    }
+    if (emailRaw.isNotEmpty && emailErr != null) {
+      throw AuthApiException(emailErr);
+    }
+    if (phoneRaw.isEmpty && emailRaw.isEmpty) {
+      throw AuthApiException(l10n.authErrorOtpNeedIdentifier);
+    }
+    String? phoneE164;
+    if (phoneRaw.isNotEmpty) {
+      phoneE164 = AuthApi.normalizePhoneE164(phoneRaw);
+    }
+    final String? em = emailRaw.isEmpty ? null : emailRaw;
+    return (phoneE164, em);
+  }
+
+  Future<void> _sendCode(AppLocalizations l10n) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    setState(() => _submitting = true);
+    try {
+      final (String? phoneE164, String? email) = _otpIdentifiersOrThrow(l10n);
+      await ref.read(authApiProvider).requestOtp(
+            phoneE164: phoneE164,
+            email: email,
+          );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _codeSent = true;
+        _otpSentPhoneE164 = phoneE164;
+        _otpSentEmail = email;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.authCodeSentSnackbar)),
+      );
+    } on AuthApiException catch (e) {
+      if (mounted) {
+        _showAuthError(e, l10n);
+      }
+    } catch (_) {
+      if (mounted) {
+        _showAuthError(Exception(), l10n);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  String? _emailPasswordFieldError(AppLocalizations l10n) {
+    final String em = _email.text.trim();
+    final String ph = _loginPhone.text.trim();
+    if (em.isEmpty && ph.isEmpty) {
+      return l10n.authErrorEmailOrPhoneRequired;
+    }
+    if (em.isNotEmpty) {
+      if (!em.contains('@')) {
+        return l10n.authErrorEmailInvalid;
+      }
+    } else if (ph.isNotEmpty) {
+      final String? pe = _validatePhoneDigits(_loginPhone.text, l10n);
+      if (pe != null) {
+        return pe;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _signInWithPassword(AppLocalizations l10n) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    final String? idErr = _emailPasswordFieldError(l10n);
+    if (idErr != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(idErr)),
+      );
+      return;
+    }
+    setState(() => _submitting = true);
+    try {
+      final String em = _email.text.trim();
+      final String phRaw = _loginPhone.text.trim();
+      String? phoneE164;
+      if (phRaw.isNotEmpty) {
+        phoneE164 = AuthApi.normalizePhoneE164(phRaw);
+      }
+      final String token = await ref.read(authApiProvider).loginWithPassword(
+            password: _password.text,
+            email: em.isEmpty ? null : em,
+            phoneE164: phoneE164,
+          );
+      final MeResponse me = await ref.read(authApiProvider).fetchMe(token);
+      if (!mounted) {
+        return;
+      }
+      await ref
+          .read(authSessionProvider.notifier)
+          .applyAuthenticatedFromApi(token, me);
+    } on AuthApiException catch (e) {
+      if (mounted) {
+        _showAuthError(e, l10n);
+      }
+    } catch (_) {
+      if (mounted) {
+        _showAuthError(Exception(), l10n);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  Future<void> _verifyOtp(AppLocalizations l10n) async {
+    if (_otp.text.trim().length < 4) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.authErrorOtpShort)),
+      );
+      return;
+    }
+    setState(() => _submitting = true);
+    try {
+      final String token = await ref.read(authApiProvider).verifyOtp(
+            code: _otp.text.trim(),
+            phoneE164: _otpSentPhoneE164,
+            email: _otpSentEmail,
+          );
+      final MeResponse me = await ref.read(authApiProvider).fetchMe(token);
+      if (!mounted) {
+        return;
+      }
+      await ref
+          .read(authSessionProvider.notifier)
+          .applyAuthenticatedFromApi(token, me);
+    } on AuthApiException catch (e) {
+      if (mounted) {
+        _showAuthError(e, l10n);
+      }
+    } catch (_) {
+      if (mounted) {
+        _showAuthError(Exception(), l10n);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
+    return Scaffold(
+      body: AuthShell(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Text(
+                  l10n.authWelcomeBack,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  l10n.loginSubtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SegmentedButton<_AuthMethod>(
+                      showSelectedIcon: false,
+                      segments: <ButtonSegment<_AuthMethod>>[
+                        ButtonSegment<_AuthMethod>(
+                          value: _AuthMethod.phone,
+                          label: Text(l10n.authMethodPhone),
+                          icon:
+                              const Icon(Icons.phone_android_rounded, size: 18),
+                        ),
+                        ButtonSegment<_AuthMethod>(
+                          value: _AuthMethod.email,
+                          label: Text(l10n.authMethodEmail),
+                          icon: const Icon(Icons.mail_outline_rounded, size: 18),
+                        ),
+                      ],
+                      selected: <_AuthMethod>{_method},
+                      onSelectionChanged: (Set<_AuthMethod> next) {
+                        setState(() {
+                          _method = next.first;
+                          _codeSent = false;
+                          _otpSentPhoneE164 = null;
+                          _otpSentEmail = null;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                if (_method == _AuthMethod.phone) ..._phoneOtpFields(l10n),
+                if (_method == _AuthMethod.email) ..._emailFields(l10n),
+                const SizedBox(height: AppSpacing.md),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: AppSpacing.xs,
+                  children: <Widget>[
+                    Text(
+                      l10n.authNoAccount,
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    TextButton(
+                      onPressed: () => context.push(AppPaths.signUp),
+                      child: Text(l10n.authSignUpCta),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _phoneOtpFields(AppLocalizations l10n) {
+    return <Widget>[
+      TextFormField(
+        controller: _phoneOtp,
+        keyboardType: TextInputType.phone,
+        autofillHints: const <String>[AutofillHints.telephoneNumber],
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp(r'[\d+\s-]')),
+        ],
+        decoration: InputDecoration(
+          labelText: l10n.authPhoneHint,
+          prefixIcon: const Icon(Icons.phone_rounded),
+          helperText: l10n.authOtpPhoneOrEmailHelper,
+        ),
+        validator: (String? v) => _validatePhoneDigits(v, l10n),
+        enabled: !_codeSent,
+      ),
+      const SizedBox(height: AppSpacing.md),
+      TextFormField(
+        controller: _otpEmail,
+        keyboardType: TextInputType.emailAddress,
+        autofillHints: const <String>[AutofillHints.email],
+        decoration: InputDecoration(
+          labelText: l10n.authEmailHintOptional,
+          prefixIcon: const Icon(Icons.alternate_email_rounded),
+          helperText: l10n.authOtpEmailPairingHelper,
+        ),
+        validator: (String? v) => _validateEmail(v, l10n),
+        enabled: !_codeSent,
+      ),
+      if (_codeSent) ...<Widget>[
+        const SizedBox(height: AppSpacing.md),
+        TextFormField(
+          controller: _otp,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: l10n.authOtpHint,
+            prefixIcon: const Icon(Icons.pin_rounded),
+          ),
+          maxLength: 6,
+        ),
+      ],
+      const SizedBox(height: AppSpacing.lg),
+      if (!_codeSent)
+        FilledButton(
+          onPressed: _submitting ? null : () => _sendCode(l10n),
+          child: _submitting
+              ? const SizedBox(
+                  height: 22,
+                  width: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.authSendCode),
+        )
+      else
+        FilledButton(
+          onPressed: _submitting ? null : () => _verifyOtp(l10n),
+          child: _submitting
+              ? const SizedBox(
+                  height: 22,
+                  width: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.authVerifyAndSignIn),
+        ),
+    ];
+  }
+
+  List<Widget> _emailFields(AppLocalizations l10n) {
+    return <Widget>[
+      TextFormField(
+        controller: _email,
+        keyboardType: TextInputType.emailAddress,
+        autofillHints: const <String>[AutofillHints.email],
+        decoration: InputDecoration(
+          labelText: l10n.authEmailHintOptional,
+          prefixIcon: const Icon(Icons.alternate_email_rounded),
+          helperText: l10n.authPasswordLoginIdentifierHelper,
+        ),
+        validator: (_) => null,
+      ),
+      const SizedBox(height: AppSpacing.md),
+      TextFormField(
+        controller: _loginPhone,
+        keyboardType: TextInputType.phone,
+        autofillHints: const <String>[AutofillHints.telephoneNumber],
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp(r'[\d+\s-]')),
+        ],
+        decoration: InputDecoration(
+          labelText: l10n.authPhoneHintOptional,
+          prefixIcon: const Icon(Icons.phone_rounded),
+        ),
+        validator: (String? v) => _validatePhoneDigits(v, l10n),
+      ),
+      const SizedBox(height: AppSpacing.md),
+      TextFormField(
+        controller: _password,
+        obscureText: true,
+        autofillHints: const <String>[AutofillHints.password],
+        decoration: InputDecoration(
+          labelText: l10n.authPasswordHint,
+          prefixIcon: const Icon(Icons.lock_outline_rounded),
+        ),
+        validator: (String? v) => _validatePassword(v, l10n),
+      ),
+      Align(
+        alignment: AlignmentDirectional.centerEnd,
+        child: TextButton(
+          onPressed: () => context.push(AppPaths.forgotPassword),
+          child: Text(l10n.authForgotPasswordLink),
+        ),
+      ),
+      const SizedBox(height: AppSpacing.md),
+      FilledButton(
+        onPressed: _submitting ? null : () => _signInWithPassword(l10n),
+        child: _submitting
+            ? const SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Text(l10n.authSignInCta),
+      ),
+    ];
+  }
+}
