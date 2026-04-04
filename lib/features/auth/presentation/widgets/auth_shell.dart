@@ -85,10 +85,10 @@ class _AuthHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
-        AppSpacing.sm,
-        topPad,
         AppSpacing.lg,
-        AppSpacing.xl + AppSpacing.sm,
+        topPad + AppSpacing.lg,
+        AppSpacing.lg,
+        AppSpacing.xl * 2,
       ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -96,65 +96,65 @@ class _AuthHeader extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: <Color>[
             colorScheme.primary,
-            Color.lerp(colorScheme.primary, colorScheme.tertiary, 0.45)!,
+            Color.lerp(colorScheme.primary, Colors.black, 0.1)!,
           ],
         ),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (showBack && onBack != null)
             Padding(
-              padding: const EdgeInsets.only(left: AppSpacing.xs),
+              padding: const EdgeInsets.only(bottom: AppSpacing.lg),
               child: IconButton(
+                visualDensity: VisualDensity.compact,
                 icon: Icon(
-                  Icons.arrow_back_rounded,
+                  Icons.arrow_back_ios_new_rounded,
                   color: colorScheme.onPrimary,
+                  size: 20,
                 ),
                 tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                 onPressed: onBack,
               ),
             ),
-          Padding(
-            padding: EdgeInsets.only(
-              left: AppSpacing.md,
-              top: showBack ? 48 : AppSpacing.lg,
-              right: AppSpacing.lg,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm + 2),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    Icons.groups_2_rounded,
-                    size: 36,
-                    color: colorScheme.onPrimary,
-                  ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: colorScheme.onPrimary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  l10n.appTitle,
-                  style: text.headlineMedium?.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                  ),
+                child: Icon(
+                  Icons.groups_2_rounded,
+                  size: 32,
+                  color: colorScheme.onPrimary,
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  l10n.authBrandTagline,
-                  style: text.bodyLarge?.copyWith(
-                    color: colorScheme.onPrimary.withValues(alpha: 0.92),
-                    height: 1.35,
-                  ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.appTitle,
+                      style: text.headlineSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    Text(
+                      l10n.authBrandTagline,
+                      style: text.bodyMedium?.copyWith(
+                        color: colorScheme.onPrimary.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

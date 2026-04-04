@@ -146,9 +146,14 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
                         child: Material(
                           color: scheme.surfaceContainerLow,
                           elevation: 0,
-                          borderRadius: BorderRadius.circular(14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: scheme.outlineVariant.withValues(alpha: 0.3),
+                            ),
+                          ),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(16),
                             onTap: () => context.push(
                               AppPaths.orgWorkerDetail(widget.orgId, w.id),
                             ),
@@ -157,16 +162,16 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
                               child: Row(
                                 children: <Widget>[
                                   CircleAvatar(
-                                    radius: 26,
+                                    radius: 28,
                                     backgroundColor:
                                         scheme.primaryContainer.withValues(
-                                      alpha: 0.9,
+                                      alpha: 0.7,
                                     ),
                                     child: Text(
                                       workerInitials(w.displayName),
                                       style: textTheme.titleMedium?.copyWith(
                                         color: scheme.onPrimaryContainer,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -180,10 +185,10 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
                                           w.displayName,
                                           style: textTheme.titleMedium
                                               ?.copyWith(
-                                            fontWeight: FontWeight.w600,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 2),
                                         Text(
                                           w.phoneE164,
                                           style: textTheme.bodySmall?.copyWith(
@@ -194,14 +199,17 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
                                           const SizedBox(height: 6),
                                           Text(
                                             w.skillsSummary!,
-                                            maxLines: 2,
+                                            maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: textTheme.bodySmall,
+                                            style: textTheme.bodySmall?.copyWith(
+                                              color: scheme.onSurfaceVariant,
+                                            ),
                                           ),
                                         ],
                                       ],
                                     ),
                                   ),
+                                  const SizedBox(width: AppSpacing.sm),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: <Widget>[
@@ -209,10 +217,10 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
                                         context,
                                         w.statusLabel,
                                       ),
-                                      const SizedBox(height: AppSpacing.sm),
+                                      const SizedBox(height: AppSpacing.xs),
                                       Icon(
                                         Icons.chevron_right_rounded,
-                                        color: scheme.onSurfaceVariant,
+                                        color: scheme.primary.withValues(alpha: 0.5),
                                       ),
                                     ],
                                   ),

@@ -71,22 +71,20 @@ class HomeScreen extends ConsumerWidget {
         title: Text(l10n.pgHome),
         actions: <Widget>[
           IconButton(
+            icon: const Icon(Icons.notifications_none_rounded),
+            onPressed: () {}, // Add notifications if available
+          ),
+          IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: l10n.pgSettings,
             onPressed: () => context.push(AppPaths.settings),
           ),
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded),
-            tooltip: l10n.pgProfile,
-            onPressed: () => context.push(AppPaths.profile),
-          ),
+          const SizedBox(width: AppSpacing.sm),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: <Widget>[
           _DashboardHero(
             l10n: l10n,
@@ -94,29 +92,28 @@ class HomeScreen extends ConsumerWidget {
             organizationName: orgTitle,
             displayName: displayName,
           ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            l10n.dashboardOrgSummaryTitle,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: scheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.dashboardOrgSummaryTitle,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              TextButton(
+                onPressed: () => context.push(AppPaths.profile),
+                child: Text(l10n.pgProfile),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.sm),
           orgDetail.when(
-            loading: () => Card(
+            loading: () => const Card(
               child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Center(
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: scheme.primary,
-                    ),
-                  ),
-                ),
+                padding: EdgeInsets.all(AppSpacing.xl),
+                child: Center(child: CircularProgressIndicator()),
               ),
             ),
             error: (Object _, StackTrace stackTrace) => Card(
@@ -138,85 +135,329 @@ class HomeScreen extends ConsumerWidget {
           if (isManager) ...<Widget>[
             Text(
               l10n.dashboardManagerActionsTitle,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: scheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: <Widget>[
-                FilledButton.tonalIcon(
-                  onPressed: () => context.push(AppPaths.orgWorkerAdd(o)),
-                  icon: const Icon(Icons.person_add_rounded),
-                  label: Text(l10n.pgWorkerAdd),
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: () => context.push(AppPaths.orgSiteNew(o)),
-                  icon: const Icon(Icons.add_location_alt_outlined),
-                  label: Text(l10n.pgSiteNew),
-                ),
-                FilledButton.tonalIcon(
-                  onPressed: () => context.push(AppPaths.orgPayPeriodNew(o)),
-                  icon: const Icon(Icons.date_range_outlined),
-                  label: Text(l10n.pgPayPeriodNew),
-                ),
-              ],
+            const SizedBox(height: AppSpacing.md),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _QuickActionChip(
+                    onPressed: () => context.push(AppPaths.orgWorkerAdd(o)),
+                    icon: Icons.person_add_rounded,
+                    label: l10n.pgWorkerAdd,
+                    color: Colors.blue.shade50,
+                    iconColor: Colors.blue.shade700,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  _QuickActionChip(
+                    onPressed: () => context.push(AppPaths.orgSiteNew(o)),
+                    icon: Icons.add_location_alt_outlined,
+                    label: l10n.pgSiteNew,
+                    color: Colors.orange.shade50,
+                    iconColor: Colors.orange.shade700,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  _QuickActionChip(
+                    onPressed: () => context.push(AppPaths.orgPayPeriodNew(o)),
+                    icon: Icons.date_range_outlined,
+                    label: l10n.pgPayPeriodNew,
+                    color: Colors.green.shade50,
+                    iconColor: Colors.green.shade700,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
           ],
           Text(
             l10n.dashboardPrimaryTitle,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: scheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints c) {
-              final double w = (c.maxWidth - AppSpacing.sm) / 2;
-              return Wrap(
-                spacing: AppSpacing.sm,
-                runSpacing: AppSpacing.sm,
-                children: <Widget>[
-                  _DashTile(
-                    width: w,
-                    icon: Icons.groups_rounded,
-                    label: l10n.pgWorkersList,
-                    onTap: () => context.push(AppPaths.orgWorkers(o)),
-                  ),
-                  _DashTile(
-                    width: w,
-                    icon: Icons.apartment_rounded,
-                    label: l10n.pgSitesList,
-                    onTap: () => context.push(AppPaths.orgSites(o)),
-                  ),
-                  _DashTile(
-                    width: w,
-                    icon: Icons.handshake_rounded,
-                    label: l10n.pgEngagementsList,
-                    onTap: () => context.push(AppPaths.orgEngagements(o)),
-                  ),
-                  _DashTile(
-                    width: w,
-                    icon: Icons.payments_outlined,
-                    label: l10n.pgPayPeriodsList,
-                    onTap: () => context.push(AppPaths.orgPayPeriods(o)),
-                  ),
-                  _DashTile(
-                    width: w,
-                    icon: Icons.calendar_month_rounded,
-                    label: l10n.pgCalendar,
-                    onTap: () => context.push(AppPaths.orgCalendar(o)),
-                  ),
-                ],
-              );
-            },
+          const SizedBox(height: AppSpacing.md),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            mainAxisSpacing: AppSpacing.md,
+            crossAxisSpacing: AppSpacing.md,
+            childAspectRatio: 1.1,
+            children: <Widget>[
+              _DashTile(
+                icon: Icons.groups_rounded,
+                label: l10n.pgWorkersList,
+                color: Colors.indigo.shade50,
+                iconColor: Colors.indigo.shade700,
+                onTap: () => context.push(AppPaths.orgWorkers(o)),
+              ),
+              _DashTile(
+                icon: Icons.apartment_rounded,
+                label: l10n.pgSitesList,
+                color: Colors.purple.shade50,
+                iconColor: Colors.purple.shade700,
+                onTap: () => context.push(AppPaths.orgSites(o)),
+              ),
+              _DashTile(
+                icon: Icons.handshake_rounded,
+                label: l10n.pgEngagementsList,
+                color: Colors.teal.shade50,
+                iconColor: Colors.teal.shade700,
+                onTap: () => context.push(AppPaths.orgEngagements(o)),
+              ),
+              _DashTile(
+                icon: Icons.payments_outlined,
+                label: l10n.pgPayPeriodsList,
+                color: Colors.amber.shade50,
+                iconColor: Colors.amber.shade900,
+                onTap: () => context.push(AppPaths.orgPayPeriods(o)),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _DashTileFull(
+            icon: Icons.calendar_month_rounded,
+            label: l10n.pgCalendar,
+            onTap: () => context.push(AppPaths.orgCalendar(o)),
           ),
           const SizedBox(height: AppSpacing.xl),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickActionChip extends StatelessWidget {
+  const _QuickActionChip({
+    required this.onPressed,
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.iconColor,
+  });
+
+  final VoidCallback onPressed;
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Color iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 20, color: iconColor),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                label,
+                style: TextStyle(
+                  color: iconColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashTile extends StatelessWidget {
+  const _DashTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    required this.color,
+    required this.iconColor,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color color;
+  final Color iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.grey.shade100, width: 1),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 28, color: iconColor),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashTileFull extends StatelessWidget {
+  const _DashTileFull({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.primaryContainer.withValues(alpha: 0.3),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Icon(icon, size: 32, color: scheme.primary),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: scheme.primary,
+                    ),
+              ),
+              const Spacer(),
+              Icon(Icons.arrow_forward_ios_rounded,
+                  size: 16, color: scheme.primary),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashboardHero extends StatelessWidget {
+  const _DashboardHero({
+    required this.l10n,
+    required this.scheme,
+    required this.organizationName,
+    required this.displayName,
+  });
+
+  final AppLocalizations l10n;
+  final ColorScheme scheme;
+  final String organizationName;
+  final String? displayName;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final String trimmed = displayName?.trim() ?? '';
+    final String greetingLine = trimmed.isNotEmpty
+        ? l10n.dashboardGreetingNamed(trimmed)
+        : l10n.dashboardGreeting;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            scheme.primary,
+            Color.lerp(scheme.primary, scheme.tertiary, 0.35)!,
+          ],
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: scheme.primary.withValues(alpha: 0.28),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Icon(
+                Icons.waving_hand_rounded,
+                color: scheme.onPrimary.withValues(alpha: 0.95),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  greetingLine,
+                  style: textTheme.titleMedium?.copyWith(
+                    color: scheme.onPrimary.withValues(alpha: 0.9),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            organizationName,
+            style: textTheme.headlineSmall?.copyWith(
+              color: scheme.onPrimary,
+              fontWeight: FontWeight.w800,
+              height: 1.15,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.dashboardSubtitle,
+            style: textTheme.titleSmall?.copyWith(
+              color: scheme.onPrimary.withValues(alpha: 0.92),
+              fontWeight: FontWeight.w500,
+              height: 1.25,
+            ),
+          ),
         ],
       ),
     );
@@ -325,139 +566,6 @@ class _OrgSummaryCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DashTile extends StatelessWidget {
-  const _DashTile({
-    required this.width,
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final double width;
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-
-    return Material(
-      color: scheme.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: SizedBox(
-          width: width,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Icon(icon, size: 32, color: scheme.primary),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DashboardHero extends StatelessWidget {
-  const _DashboardHero({
-    required this.l10n,
-    required this.scheme,
-    required this.organizationName,
-    required this.displayName,
-  });
-
-  final AppLocalizations l10n;
-  final ColorScheme scheme;
-  final String organizationName;
-  final String? displayName;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final String trimmed = displayName?.trim() ?? '';
-    final String greetingLine = trimmed.isNotEmpty
-        ? l10n.dashboardGreetingNamed(trimmed)
-        : l10n.dashboardGreeting;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            scheme.primary,
-            Color.lerp(scheme.primary, scheme.tertiary, 0.35)!,
-          ],
-        ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: scheme.primary.withValues(alpha: 0.28),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.waving_hand_rounded,
-                color: scheme.onPrimary.withValues(alpha: 0.95),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  greetingLine,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: scheme.onPrimary.withValues(alpha: 0.9),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            organizationName,
-            style: textTheme.headlineSmall?.copyWith(
-              color: scheme.onPrimary,
-              fontWeight: FontWeight.w800,
-              height: 1.15,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            l10n.dashboardSubtitle,
-            style: textTheme.titleSmall?.copyWith(
-              color: scheme.onPrimary.withValues(alpha: 0.92),
-              fontWeight: FontWeight.w500,
-              height: 1.25,
-            ),
-          ),
-        ],
       ),
     );
   }

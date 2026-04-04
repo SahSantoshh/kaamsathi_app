@@ -138,17 +138,20 @@ class WorkerDetailScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: scheme.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: scheme.outlineVariant.withValues(alpha: 0.4),
+                        color: scheme.outlineVariant.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
                       detail.notes?.isNotEmpty == true ? detail.notes! : '—',
-                      style: textTheme.bodyMedium?.copyWith(height: 1.45),
+                      style: textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),

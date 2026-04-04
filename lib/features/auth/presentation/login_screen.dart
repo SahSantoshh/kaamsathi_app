@@ -263,80 +263,70 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: AuthShell(
         child: Form(
           key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(
-                  l10n.authWelcomeBack,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text(
+                l10n.authWelcomeBack,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.loginSubtitle,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              SegmentedButton<LoginAuthMode>(
+                showSelectedIcon: false,
+                segments: <ButtonSegment<LoginAuthMode>>[
+                  ButtonSegment<LoginAuthMode>(
+                    value: LoginAuthMode.otp,
+                    label: Text(l10n.authMethodOtp),
+                    icon: const Icon(Icons.sms_outlined, size: 18),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  l10n.loginSubtitle,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    height: 1.4,
+                  ButtonSegment<LoginAuthMode>(
+                    value: LoginAuthMode.password,
+                    label: Text(l10n.authMethodPassword),
+                    icon: const Icon(Icons.lock_outline_rounded, size: 18),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: SegmentedButton<LoginAuthMode>(
-                      showSelectedIcon: false,
-                      segments: <ButtonSegment<LoginAuthMode>>[
-                        ButtonSegment<LoginAuthMode>(
-                          value: LoginAuthMode.otp,
-                          label: Text(l10n.authMethodOtp),
-                          icon: const Icon(Icons.sms_outlined, size: 18),
-                        ),
-                        ButtonSegment<LoginAuthMode>(
-                          value: LoginAuthMode.password,
-                          label: Text(l10n.authMethodPassword),
-                          icon:
-                              const Icon(Icons.lock_outline_rounded, size: 18),
-                        ),
-                      ],
-                      selected: <LoginAuthMode>{_authMode},
-                      onSelectionChanged: (Set<LoginAuthMode> next) {
-                        final LoginAuthMode mode = next.first;
-                        setState(() {
-                          _authMode = mode;
-                          _codeSent = false;
-                          _otpSentPhoneE164 = null;
-                          _otpSentEmail = null;
-                          _otp.clear();
-                        });
-                        unawaited(LoginMethodPreferenceStore.save(mode));
-                      },
-                    ),
+                ],
+                selected: <LoginAuthMode>{_authMode},
+                onSelectionChanged: (Set<LoginAuthMode> next) {
+                  final LoginAuthMode mode = next.first;
+                  setState(() {
+                    _authMode = mode;
+                    _codeSent = false;
+                    _otpSentPhoneE164 = null;
+                    _otpSentEmail = null;
+                    _otp.clear();
+                  });
+                  unawaited(LoginMethodPreferenceStore.save(mode));
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              if (_authMode == LoginAuthMode.otp) ..._phoneOtpFields(l10n),
+              if (_authMode == LoginAuthMode.password)
+                ..._passwordFields(l10n),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    l10n.authNoAccount,
+                    style: theme.textTheme.bodySmall,
                   ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                if (_authMode == LoginAuthMode.otp) ..._phoneOtpFields(l10n),
-                if (_authMode == LoginAuthMode.password)
-                  ..._passwordFields(l10n),
-                const SizedBox(height: AppSpacing.md),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: AppSpacing.xs,
-                  children: <Widget>[
-                    Text(
-                      l10n.authNoAccount,
-                      style: theme.textTheme.bodySmall,
-                    ),
-                    TextButton(
-                      onPressed: () => context.push(AppPaths.signUp),
-                      child: Text(l10n.authSignUpCta),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  TextButton(
+                    onPressed: () => context.push(AppPaths.signUp),
+                    child: Text(l10n.authSignUpCta),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
