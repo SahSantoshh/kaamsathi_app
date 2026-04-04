@@ -4,5 +4,7 @@ export 'kaam_confirm_dialog.dart';
 export 'kaam_empty_state.dart';
 export 'kaam_error_banner.dart';
 export 'kaam_outlined_button.dart';
+export 'kaam_phone_field.dart';
+export 'kaam_pin_input.dart';
 export 'kaam_placeholder_page.dart';
 export 'kaam_primary_button.dart';

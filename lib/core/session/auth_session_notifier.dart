@@ -21,6 +21,7 @@ class AuthSessionNotifier extends Notifier<AuthState> {
       }
       await storage.writeAccessToken(s.accessToken!);
       await storage.writeMeProfile(s.meProfile);
+      await storage.writeMeMemberships(s.memberships);
       await storage.writeSessionFields(
         organizationId: s.selectedOrganizationId,
         membershipCount: s.membershipCount,
@@ -55,12 +56,18 @@ class AuthSessionNotifier extends Notifier<AuthState> {
       final Map<String, dynamic>? cachedProfile = await storage
           .readMeProfile()
           .timeout(const Duration(seconds: 3), onTimeout: () => null);
+      final List<Map<String, dynamic>>? cachedMemberships = await storage
+          .readMeMemberships()
+          .timeout(const Duration(seconds: 3), onTimeout: () => null);
       state = AuthState(
         accessToken: token,
         selectedOrganizationId: fields.organizationId,
         membershipCount: fields.membershipCount,
         role: fields.role,
         meProfile: _copyProfileMap(cachedProfile),
+        memberships: cachedMemberships != null
+            ? List<Map<String, dynamic>>.from(cachedMemberships)
+            : const <Map<String, dynamic>>[],
       );
     } on Object {
       // e.g. MissingPluginException in widget tests without platform channels.
@@ -115,6 +122,7 @@ class AuthSessionNotifier extends Notifier<AuthState> {
       membershipCount: count,
       role: role,
       meProfile: _copyProfileMap(me.meData),
+      memberships: me.memberships.map(Map<String, dynamic>.from).toList(),
     );
     unawaited(_persistSession());
   }
@@ -151,6 +159,7 @@ class AuthSessionNotifier extends Notifier<AuthState> {
       membershipCount: nextCount,
       role: state.role,
       meProfile: state.meProfile,
+      memberships: state.memberships,
     );
     unawaited(_persistSession());
   }
@@ -202,6 +211,7 @@ class AuthSessionNotifier extends Notifier<AuthState> {
       membershipCount: state.membershipCount,
       role: role ?? state.role,
       meProfile: state.meProfile,
+      memberships: state.memberships,
     );
     unawaited(_persistSession());
   }
@@ -213,6 +223,7 @@ class AuthSessionNotifier extends Notifier<AuthState> {
       membershipCount: state.membershipCount,
       role: state.role,
       meProfile: state.meProfile,
+      memberships: state.memberships,
     );
     unawaited(_persistSession());
   }

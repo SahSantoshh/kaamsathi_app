@@ -555,6 +555,46 @@ class _OrgProfileLoadedState extends ConsumerState<_OrgProfileLoaded> {
             ],
           ),
         ),
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          l10n.dashboardMoreTitle,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: scheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Card(
+          margin: EdgeInsets.zero,
+          elevation: 0,
+          color: scheme.surfaceContainerLow,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(
+              color: scheme.outlineVariant.withValues(alpha: 0.35),
+            ),
+          ),
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.swap_horiz_rounded),
+                title: Text(l10n.dashboardSwitchOrg),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(AppPaths.selectOrganization),
+              ),
+              Divider(
+                height: 1,
+                color: scheme.outlineVariant.withValues(alpha: 0.35),
+              ),
+              ListTile(
+                leading: const Icon(Icons.star_outline_rounded),
+                title: Text(l10n.dashboardRatingsReports),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(AppPaths.orgRatings(widget.orgId)),
+              ),
+            ],
+          ),
+        ),
         if (widget.canEdit) ...<Widget>[
           const SizedBox(height: AppSpacing.xl),
           Text(

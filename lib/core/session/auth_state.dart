@@ -10,6 +10,7 @@ class AuthState {
     this.membershipCount = 0,
     this.role = AppMembershipRole.manager,
     this.meProfile,
+    this.memberships = const <Map<String, dynamic>>[],
   });
 
   /// Raw JWT string without `Bearer ` (null = signed out).
@@ -26,6 +27,9 @@ class AuthState {
   /// Root `data` object from the last `GET /me` (user profile). Extra keys are
   /// preserved for API evolution (phones, address, future fields).
   final Map<String, dynamic>? meProfile;
+
+  /// `GET /me` → `memberships` (organizations, roles, pay schedule snapshot).
+  final List<Map<String, dynamic>> memberships;
 
   bool get isAuthenticated => accessToken != null;
 }

@@ -39,7 +39,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authMethodEmail => 'Email';
 
   @override
+  String get authMethodOtp => 'One-time code';
+
+  @override
+  String get authMethodPassword => 'Password';
+
+  @override
   String get authPhoneHint => 'Mobile number';
+
+  @override
+  String get phoneCountrySearchHint => 'Search country or code';
 
   @override
   String get authPhoneHelper => 'We’ll send a one-time code by SMS.';
@@ -156,7 +165,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authApiSignUpExplainer =>
-      'New accounts are created when you sign in with a sign-in code: on the login screen, choose Phone, enter your phone and/or email, and confirm the 6-digit code sent to your account email. If the server returns an error, add the missing phone or email and try again.';
+      'New accounts are created when you sign in with a sign-in code: on the login screen, choose One-time code, enter your phone and/or email, and confirm the 6-digit code sent to your account email. If the server returns an error, add the missing phone or email and try again.';
 
   @override
   String get authForgotPasswordStep1Subtitle =>
@@ -440,9 +449,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardSwitchOrg => 'Switch organization';
 
   @override
-  String get dashboardNewOrganization => 'New organization';
-
-  @override
   String get dashboardMoreTitle => 'More';
 
   @override
@@ -511,6 +517,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pgProfile => 'Profile';
+
+  @override
+  String get profileSectionAccount => 'Account';
+
+  @override
+  String get profileSectionOrganizations => 'Organizations';
+
+  @override
+  String get profileFieldUserId => 'User ID';
+
+  @override
+  String get profileFieldMemberSince => 'Member since';
+
+  @override
+  String get profileFieldNameParts => 'Legal name';
+
+  @override
+  String get profileFieldFullName => 'Full name';
+
+  @override
+  String get profileFieldFirstName => 'First name';
+
+  @override
+  String get profileFieldMiddleName => 'Middle name';
+
+  @override
+  String get profileFieldLastName => 'Last name';
+
+  @override
+  String get profileFieldMembershipSince => 'In this organization since';
+
+  @override
+  String get profilePhonePrimary => 'Primary';
+
+  @override
+  String profilePhoneVerifiedOn(String date) {
+    return 'Verified $date';
+  }
+
+  @override
+  String get profilePhoneNotVerified => 'Not verified yet';
+
+  @override
+  String get profileOpenPhoneSettings => 'Phone number settings';
+
+  @override
+  String get profileNoPhonesDetail =>
+      'Add or verify numbers in settings when available.';
+
+  @override
+  String get profileNoMembershipsDetail =>
+      'Create or join an organization from the home flow.';
+
+  @override
+  String get profileOrgYourRole => 'Your role';
+
+  @override
+  String get profileCurrentWorkspaceBadge => 'Current workspace';
 
   @override
   String get profileMeDataHint =>

@@ -1,18 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:kaamsathi/l10n/app_localizations.dart';
 
+import '../../../core/preferences/login_method_preference.dart';
 import '../../../core/router/app_paths.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/session/auth_session_notifier.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/kaam_phone_field.dart';
+import '../../../shared/widgets/kaam_pin_input.dart';
 import '../data/auth_api.dart';
 import '../data/auth_api_provider.dart';
 import 'widgets/auth_shell.dart';
-
-enum _AuthMethod { phone, email }
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -32,11 +35,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _loginPhone = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
-  _AuthMethod _method = _AuthMethod.email;
   bool _codeSent = false;
   bool _submitting = false;
   String? _otpSentPhoneE164;
   String? _otpSentEmail;
+  PhoneNumber? _phoneOtpNumber;
+  PhoneNumber? _loginPhoneNumber;
+
+  LoginAuthMode _authMode = LoginAuthMode.password;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_restoreLoginPreference());
+  }
+
+  Future<void> _restoreLoginPreference() async {
+    final LoginAuthMode mode = await LoginMethodPreferenceStore.load();
+    if (!mounted) {
+      return;
+    }
+    setState(() => _authMode = mode);
+  }
 
   @override
   void dispose() {
@@ -47,17 +67,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _loginPhone.dispose();
     _password.dispose();
     super.dispose();
-  }
-
-  String? _validatePhoneDigits(String? v, AppLocalizations l10n) {
-    final String t = (v ?? '').trim().replaceAll(RegExp(r'\s'), '');
-    if (t.isEmpty) {
-      return null;
-    }
-    if (t.length < 10) {
-      return l10n.authErrorPhoneInvalid;
-    }
-    return null;
   }
 
   String? _validateEmail(String? v, AppLocalizations l10n) {
@@ -86,24 +95,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   /// Returns `(phoneE164, email)` with at least one non-null for send OTP.
   (String?, String?) _otpIdentifiersOrThrow(AppLocalizations l10n) {
-    final String phoneRaw = _phoneOtp.text.trim();
+    final String nationalDigits =
+        _phoneOtp.text.replaceAll(RegExp(r'\D'), '');
     final String emailRaw = _otpEmail.text.trim();
     final String? emailErr = _validateEmail(_otpEmail.text, l10n);
-    final String? phoneErr =
-        phoneRaw.isEmpty ? null : _validatePhoneDigits(_phoneOtp.text, l10n);
 
-    if (phoneRaw.isNotEmpty && phoneErr != null) {
-      throw AuthApiException(phoneErr);
-    }
     if (emailRaw.isNotEmpty && emailErr != null) {
       throw AuthApiException(emailErr);
     }
-    if (phoneRaw.isEmpty && emailRaw.isEmpty) {
+    if (nationalDigits.isEmpty && emailRaw.isEmpty) {
       throw AuthApiException(l10n.authErrorOtpNeedIdentifier);
     }
     String? phoneE164;
-    if (phoneRaw.isNotEmpty) {
-      phoneE164 = AuthApi.normalizePhoneE164(phoneRaw);
+    if (nationalDigits.isNotEmpty) {
+      if (_phoneOtpNumber == null) {
+        throw AuthApiException(l10n.authErrorPhoneInvalid);
+      }
+      phoneE164 = AuthApi.phoneNumberToE164(_phoneOtpNumber!);
     }
     final String? em = emailRaw.isEmpty ? null : emailRaw;
     return (phoneE164, em);
@@ -127,6 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _codeSent = true;
         _otpSentPhoneE164 = phoneE164;
         _otpSentEmail = email;
+        _otp.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.authCodeSentSnackbar)),
@@ -148,18 +157,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   String? _emailPasswordFieldError(AppLocalizations l10n) {
     final String em = _email.text.trim();
-    final String ph = _loginPhone.text.trim();
-    if (em.isEmpty && ph.isEmpty) {
+    final String phDigits = _loginPhone.text.replaceAll(RegExp(r'\D'), '');
+    if (em.isEmpty && phDigits.isEmpty) {
       return l10n.authErrorEmailOrPhoneRequired;
     }
     if (em.isNotEmpty) {
       if (!em.contains('@')) {
         return l10n.authErrorEmailInvalid;
-      }
-    } else if (ph.isNotEmpty) {
-      final String? pe = _validatePhoneDigits(_loginPhone.text, l10n);
-      if (pe != null) {
-        return pe;
       }
     }
     return null;
@@ -179,10 +183,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _submitting = true);
     try {
       final String em = _email.text.trim();
-      final String phRaw = _loginPhone.text.trim();
+      final String phDigits = _loginPhone.text.replaceAll(RegExp(r'\D'), '');
       String? phoneE164;
-      if (phRaw.isNotEmpty) {
-        phoneE164 = AuthApi.normalizePhoneE164(phRaw);
+      if (phDigits.isNotEmpty) {
+        if (_loginPhoneNumber == null) {
+          throw AuthApiException(l10n.authErrorPhoneInvalid);
+        }
+        phoneE164 = AuthApi.phoneNumberToE164(_loginPhoneNumber!);
       }
       final String token = await ref.read(authApiProvider).loginWithPassword(
             password: _password.text,
@@ -278,36 +285,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Center(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: SegmentedButton<_AuthMethod>(
+                    child: SegmentedButton<LoginAuthMode>(
                       showSelectedIcon: false,
-                      segments: <ButtonSegment<_AuthMethod>>[
-                        ButtonSegment<_AuthMethod>(
-                          value: _AuthMethod.phone,
-                          label: Text(l10n.authMethodPhone),
-                          icon:
-                              const Icon(Icons.phone_android_rounded, size: 18),
+                      segments: <ButtonSegment<LoginAuthMode>>[
+                        ButtonSegment<LoginAuthMode>(
+                          value: LoginAuthMode.otp,
+                          label: Text(l10n.authMethodOtp),
+                          icon: const Icon(Icons.sms_outlined, size: 18),
                         ),
-                        ButtonSegment<_AuthMethod>(
-                          value: _AuthMethod.email,
-                          label: Text(l10n.authMethodEmail),
-                          icon: const Icon(Icons.mail_outline_rounded, size: 18),
+                        ButtonSegment<LoginAuthMode>(
+                          value: LoginAuthMode.password,
+                          label: Text(l10n.authMethodPassword),
+                          icon:
+                              const Icon(Icons.lock_outline_rounded, size: 18),
                         ),
                       ],
-                      selected: <_AuthMethod>{_method},
-                      onSelectionChanged: (Set<_AuthMethod> next) {
+                      selected: <LoginAuthMode>{_authMode},
+                      onSelectionChanged: (Set<LoginAuthMode> next) {
+                        final LoginAuthMode mode = next.first;
                         setState(() {
-                          _method = next.first;
+                          _authMode = mode;
                           _codeSent = false;
                           _otpSentPhoneE164 = null;
                           _otpSentEmail = null;
+                          _otp.clear();
                         });
+                        unawaited(LoginMethodPreferenceStore.save(mode));
                       },
                     ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                if (_method == _AuthMethod.phone) ..._phoneOtpFields(l10n),
-                if (_method == _AuthMethod.email) ..._emailFields(l10n),
+                if (_authMode == LoginAuthMode.otp) ..._phoneOtpFields(l10n),
+                if (_authMode == LoginAuthMode.password)
+                  ..._passwordFields(l10n),
                 const SizedBox(height: AppSpacing.md),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -334,19 +345,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   List<Widget> _phoneOtpFields(AppLocalizations l10n) {
     return <Widget>[
-      TextFormField(
+      KaamPhoneField(
         controller: _phoneOtp,
-        keyboardType: TextInputType.phone,
-        autofillHints: const <String>[AutofillHints.telephoneNumber],
-        inputFormatters: <TextInputFormatter>[
-          FilteringTextInputFormatter.allow(RegExp(r'[\d+\s-]')),
-        ],
+        onPhoneUpdate: (PhoneNumber phone) =>
+            setState(() => _phoneOtpNumber = phone),
         decoration: InputDecoration(
           labelText: l10n.authPhoneHint,
-          prefixIcon: const Icon(Icons.phone_rounded),
           helperText: l10n.authOtpPhoneOrEmailHelper,
         ),
-        validator: (String? v) => _validatePhoneDigits(v, l10n),
         enabled: !_codeSent,
       ),
       const SizedBox(height: AppSpacing.md),
@@ -364,14 +370,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
       if (_codeSent) ...<Widget>[
         const SizedBox(height: AppSpacing.md),
-        TextFormField(
+        KaamPinInput(
           controller: _otp,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: l10n.authOtpHint,
-            prefixIcon: const Icon(Icons.pin_rounded),
-          ),
-          maxLength: 6,
+          length: 6,
+          autofocus: true,
+          label: l10n.authOtpHint,
         ),
       ],
       const SizedBox(height: AppSpacing.lg),
@@ -400,8 +403,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ];
   }
 
-  List<Widget> _emailFields(AppLocalizations l10n) {
+  List<Widget> _passwordFields(AppLocalizations l10n) {
     return <Widget>[
+      KaamPhoneField(
+        controller: _loginPhone,
+        onPhoneUpdate: (PhoneNumber phone) =>
+            setState(() => _loginPhoneNumber = phone),
+        decoration: InputDecoration(
+          labelText: l10n.authPhoneHintOptional,
+          helperText: l10n.authPasswordLoginIdentifierHelper,
+        ),
+      ),
+      const SizedBox(height: AppSpacing.md),
       TextFormField(
         controller: _email,
         keyboardType: TextInputType.emailAddress,
@@ -409,23 +422,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         decoration: InputDecoration(
           labelText: l10n.authEmailHintOptional,
           prefixIcon: const Icon(Icons.alternate_email_rounded),
-          helperText: l10n.authPasswordLoginIdentifierHelper,
         ),
         validator: (_) => null,
-      ),
-      const SizedBox(height: AppSpacing.md),
-      TextFormField(
-        controller: _loginPhone,
-        keyboardType: TextInputType.phone,
-        autofillHints: const <String>[AutofillHints.telephoneNumber],
-        inputFormatters: <TextInputFormatter>[
-          FilteringTextInputFormatter.allow(RegExp(r'[\d+\s-]')),
-        ],
-        decoration: InputDecoration(
-          labelText: l10n.authPhoneHintOptional,
-          prefixIcon: const Icon(Icons.phone_rounded),
-        ),
-        validator: (String? v) => _validatePhoneDigits(v, l10n),
       ),
       const SizedBox(height: AppSpacing.md),
       TextFormField(

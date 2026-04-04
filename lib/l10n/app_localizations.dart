@@ -154,11 +154,29 @@ abstract class AppLocalizations {
   /// **'Email'**
   String get authMethodEmail;
 
+  /// No description provided for @authMethodOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time code'**
+  String get authMethodOtp;
+
+  /// No description provided for @authMethodPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authMethodPassword;
+
   /// No description provided for @authPhoneHint.
   ///
   /// In en, this message translates to:
   /// **'Mobile number'**
   String get authPhoneHint;
+
+  /// No description provided for @phoneCountrySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search country or code'**
+  String get phoneCountrySearchHint;
 
   /// No description provided for @authPhoneHelper.
   ///
@@ -373,7 +391,7 @@ abstract class AppLocalizations {
   /// No description provided for @authApiSignUpExplainer.
   ///
   /// In en, this message translates to:
-  /// **'New accounts are created when you sign in with a sign-in code: on the login screen, choose Phone, enter your phone and/or email, and confirm the 6-digit code sent to your account email. If the server returns an error, add the missing phone or email and try again.'**
+  /// **'New accounts are created when you sign in with a sign-in code: on the login screen, choose One-time code, enter your phone and/or email, and confirm the 6-digit code sent to your account email. If the server returns an error, add the missing phone or email and try again.'**
   String get authApiSignUpExplainer;
 
   /// No description provided for @authForgotPasswordStep1Subtitle.
@@ -892,12 +910,6 @@ abstract class AppLocalizations {
   /// **'Switch organization'**
   String get dashboardSwitchOrg;
 
-  /// No description provided for @dashboardNewOrganization.
-  ///
-  /// In en, this message translates to:
-  /// **'New organization'**
-  String get dashboardNewOrganization;
-
   /// No description provided for @dashboardMoreTitle.
   ///
   /// In en, this message translates to:
@@ -1035,6 +1047,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get pgProfile;
+
+  /// No description provided for @profileSectionAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get profileSectionAccount;
+
+  /// No description provided for @profileSectionOrganizations.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizations'**
+  String get profileSectionOrganizations;
+
+  /// No description provided for @profileFieldUserId.
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get profileFieldUserId;
+
+  /// No description provided for @profileFieldMemberSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Member since'**
+  String get profileFieldMemberSince;
+
+  /// No description provided for @profileFieldNameParts.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal name'**
+  String get profileFieldNameParts;
+
+  /// No description provided for @profileFieldFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get profileFieldFullName;
+
+  /// No description provided for @profileFieldFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get profileFieldFirstName;
+
+  /// No description provided for @profileFieldMiddleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Middle name'**
+  String get profileFieldMiddleName;
+
+  /// No description provided for @profileFieldLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get profileFieldLastName;
+
+  /// No description provided for @profileFieldMembershipSince.
+  ///
+  /// In en, this message translates to:
+  /// **'In this organization since'**
+  String get profileFieldMembershipSince;
+
+  /// No description provided for @profilePhonePrimary.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary'**
+  String get profilePhonePrimary;
+
+  /// No description provided for @profilePhoneVerifiedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified {date}'**
+  String profilePhoneVerifiedOn(String date);
+
+  /// No description provided for @profilePhoneNotVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not verified yet'**
+  String get profilePhoneNotVerified;
+
+  /// No description provided for @profileOpenPhoneSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number settings'**
+  String get profileOpenPhoneSettings;
+
+  /// No description provided for @profileNoPhonesDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or verify numbers in settings when available.'**
+  String get profileNoPhonesDetail;
+
+  /// No description provided for @profileNoMembershipsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Create or join an organization from the home flow.'**
+  String get profileNoMembershipsDetail;
+
+  /// No description provided for @profileOrgYourRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role'**
+  String get profileOrgYourRole;
+
+  /// No description provided for @profileCurrentWorkspaceBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Current workspace'**
+  String get profileCurrentWorkspaceBadge;
 
   /// No description provided for @profileMeDataHint.
   ///

@@ -71,11 +71,6 @@ class HomeScreen extends ConsumerWidget {
         title: Text(l10n.pgHome),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: l10n.dashboardSwitchOrg,
-            onPressed: () => context.push(AppPaths.selectOrganization),
-          ),
-          IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: l10n.pgSettings,
             onPressed: () => context.push(AppPaths.settings),
@@ -220,56 +215,6 @@ class HomeScreen extends ConsumerWidget {
                 ],
               );
             },
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            l10n.dashboardMoreTitle,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: scheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Card(
-            margin: EdgeInsets.zero,
-            elevation: 0,
-            color: scheme.surfaceContainerLow,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: BorderSide(
-                color: scheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                ListTile(
-                  leading: const Icon(Icons.swap_horiz_rounded),
-                  title: Text(l10n.dashboardSwitchOrg),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push(AppPaths.selectOrganization),
-                ),
-                Divider(
-                  height: 1,
-                  color: scheme.outlineVariant.withValues(alpha: 0.35),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.add_business_outlined),
-                  title: Text(l10n.dashboardNewOrganization),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push(AppPaths.organizationCreate),
-                ),
-                Divider(
-                  height: 1,
-                  color: scheme.outlineVariant.withValues(alpha: 0.35),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.star_outline_rounded),
-                  title: Text(l10n.dashboardRatingsReports),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => context.push(AppPaths.orgRatings(o)),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: AppSpacing.xl),
         ],

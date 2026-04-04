@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 /// Thrown when an auth request fails. Prefer showing [message] in UI; use
 /// [errorCode] for branching (e.g. `need_email`, `need_phone`).
@@ -56,6 +57,15 @@ class AuthApi {
       throw AuthApiException('Phone number is required');
     }
     return t.startsWith('+') ? t : '+$t';
+  }
+
+  /// E.164 string from an [IntlPhoneField] / [PhoneNumber] value.
+  static String phoneNumberToE164(PhoneNumber phone) {
+    final String national = phone.number.replaceAll(RegExp(r'\D'), '');
+    if (national.isEmpty) {
+      throw AuthApiException('Phone number is required');
+    }
+    return normalizePhoneE164('${phone.countryCode}$national');
   }
 
   /// `POST /auth/otp` — send at least one of [phoneE164] or [email].

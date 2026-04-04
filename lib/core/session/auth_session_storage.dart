@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_membership_role.dart';
 
-/// Persists **JWT** and **`GET /me` `data`** (user profile JSON) in secure storage;
+/// Persists **JWT**, **`GET /me` `data`**, and **`memberships`** JSON in secure storage;
 /// org id / counts / role in [SharedPreferences].
 /// **Default organization** (`kaam_default_organization_id`) is client-only (§6).
 final Provider<AuthSessionStorage> authSessionStorageProvider =
@@ -18,6 +18,7 @@ class AuthSessionStorage {
 
   static const String _kToken = 'kaam_access_token';
   static const String _kMeProfile = 'kaam_me_profile_json';
+  static const String _kMeMemberships = 'kaam_me_memberships_json';
   static const String _kOrgId = 'kaam_selected_org_id';
   static const String _kDefaultOrgId = 'kaam_default_organization_id';
   static const String _kMembershipCount = 'kaam_membership_count';
@@ -59,6 +60,43 @@ class AuthSessionStorage {
       return;
     }
     await _secure.write(key: _kMeProfile, value: jsonEncode(profile));
+  }
+
+  Future<List<Map<String, dynamic>>?> readMeMemberships() async {
+    final String? raw = await _secure.read(key: _kMeMemberships);
+    if (raw == null || raw.isEmpty) {
+      return null;
+    }
+    try {
+      final Object? decoded = jsonDecode(raw);
+      if (decoded is! List<dynamic>) {
+        return null;
+      }
+      final List<Map<String, dynamic>> out = <Map<String, dynamic>>[];
+      for (final Object? item in decoded) {
+        if (item is Map<String, dynamic>) {
+          out.add(Map<String, dynamic>.from(item));
+        } else if (item is Map) {
+          out.add(
+            Map<String, dynamic>.from(
+              item.map((Object? k, Object? v) => MapEntry(k.toString(), v)),
+            ),
+          );
+        }
+      }
+      return out;
+    } on Object {
+      await _secure.delete(key: _kMeMemberships);
+    }
+    return null;
+  }
+
+  Future<void> writeMeMemberships(List<Map<String, dynamic>> memberships) async {
+    if (memberships.isEmpty) {
+      await _secure.delete(key: _kMeMemberships);
+      return;
+    }
+    await _secure.write(key: _kMeMemberships, value: jsonEncode(memberships));
   }
 
   Future<String?> readDefaultOrganizationId() async {
@@ -112,6 +150,7 @@ class AuthSessionStorage {
   Future<void> clearAll() async {
     await _secure.delete(key: _kToken);
     await _secure.delete(key: _kMeProfile);
+    await _secure.delete(key: _kMeMemberships);
     final SharedPreferences p = await SharedPreferences.getInstance();
     await p.remove(_kOrgId);
     await p.remove(_kDefaultOrgId);

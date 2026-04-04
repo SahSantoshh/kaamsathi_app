@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kaamsathi/l10n/app_localizations.dart';
 
@@ -8,6 +8,8 @@ import '../../../core/router/app_paths.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/session/auth_session_notifier.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/kaam_phone_field.dart';
+import '../../../shared/widgets/kaam_pin_input.dart';
 import '../data/auth_api.dart';
 import '../data/auth_api_provider.dart';
 import 'widgets/auth_shell.dart';
@@ -34,6 +36,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   bool _submitting = false;
   String? _sentPhoneE164;
   String? _sentEmail;
+  PhoneNumber? _phoneNumber;
 
   @override
   void dispose() {
@@ -43,17 +46,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     _password.dispose();
     _confirm.dispose();
     super.dispose();
-  }
-
-  String? _validatePhoneDigits(String? v, AppLocalizations l10n) {
-    final String t = (v ?? '').trim().replaceAll(RegExp(r'\s'), '');
-    if (t.isEmpty) {
-      return null;
-    }
-    if (t.length < 10) {
-      return l10n.authErrorPhoneInvalid;
-    }
-    return null;
   }
 
   String? _validateEmail(String? v, AppLocalizations l10n) {
@@ -68,23 +60,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   (String?, String?) _identifiersOrThrow(AppLocalizations l10n) {
-    final String phoneRaw = _phone.text.trim();
+    final String nationalDigits = _phone.text.replaceAll(RegExp(r'\D'), '');
     final String emailRaw = _email.text.trim();
     final String? emailErr = _validateEmail(_email.text, l10n);
-    final String? phoneErr =
-        phoneRaw.isEmpty ? null : _validatePhoneDigits(_phone.text, l10n);
-    if (phoneRaw.isNotEmpty && phoneErr != null) {
-      throw AuthApiException(phoneErr);
-    }
     if (emailRaw.isNotEmpty && emailErr != null) {
       throw AuthApiException(emailErr);
     }
-    if (phoneRaw.isEmpty && emailRaw.isEmpty) {
+    if (nationalDigits.isEmpty && emailRaw.isEmpty) {
       throw AuthApiException(l10n.authErrorOtpNeedIdentifier);
     }
     String? phoneE164;
-    if (phoneRaw.isNotEmpty) {
-      phoneE164 = AuthApi.normalizePhoneE164(phoneRaw);
+    if (nationalDigits.isNotEmpty) {
+      if (_phoneNumber == null) {
+        throw AuthApiException(l10n.authErrorPhoneInvalid);
+      }
+      phoneE164 = AuthApi.phoneNumberToE164(_phoneNumber!);
     }
     final String? em = emailRaw.isEmpty ? null : emailRaw;
     return (phoneE164, em);
@@ -217,17 +207,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 if (!_step2) ...<Widget>[
-                  TextFormField(
+                  KaamPhoneField(
                     controller: _phone,
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(RegExp(r'[\d+\s-]')),
-                    ],
+                    onPhoneUpdate: (PhoneNumber phone) =>
+                        setState(() => _phoneNumber = phone),
                     decoration: InputDecoration(
                       labelText: l10n.authPhoneHint,
-                      prefixIcon: const Icon(Icons.phone_rounded),
                     ),
-                    validator: (String? v) => _validatePhoneDigits(v, l10n),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   TextFormField(
@@ -252,14 +238,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         : Text(l10n.authForgotPasswordCta),
                   ),
                 ] else ...<Widget>[
-                  TextFormField(
+                  KaamPinInput(
                     controller: _code,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: l10n.authOtpHint,
-                      prefixIcon: const Icon(Icons.pin_rounded),
-                    ),
-                    maxLength: 6,
+                    length: 6,
+                    autofocus: true,
+                    label: l10n.authOtpHint,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   TextFormField(

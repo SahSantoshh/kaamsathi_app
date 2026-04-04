@@ -124,6 +124,12 @@ class _OrgListBody extends ConsumerWidget {
             height: 1.45,
           ),
         ),
+        const SizedBox(height: AppSpacing.md),
+        FilledButton.tonalIcon(
+          onPressed: () => context.push(AppPaths.organizationCreate),
+          icon: const Icon(Icons.add_business_outlined),
+          label: Text(l10n.pgOrganizationCreate),
+        ),
         const SizedBox(height: AppSpacing.lg),
         if (rows.isEmpty) ...<Widget>[
           Text(
@@ -167,11 +173,6 @@ class _OrgListBody extends ConsumerWidget {
               ),
             );
           }),
-        OutlinedButton.icon(
-          onPressed: () => context.push(AppPaths.organizationCreate),
-          icon: const Icon(Icons.add_business_outlined),
-          label: Text(l10n.pgOrganizationCreate),
-        ),
       ],
     );
   }

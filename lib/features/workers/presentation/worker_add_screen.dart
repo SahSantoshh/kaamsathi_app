@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import 'package:kaamsathi/l10n/app_localizations.dart';
 
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../features/auth/data/auth_api.dart';
+import '../../../shared/widgets/kaam_phone_field.dart';
 import '../data/workers_mock_data.dart';
 import '../domain/worker_models.dart';
 import 'worker_ui_helpers.dart';
@@ -22,6 +24,7 @@ class WorkerAddScreen extends StatefulWidget {
 
 class _WorkerAddScreenState extends State<WorkerAddScreen> {
   final TextEditingController _phone = TextEditingController();
+  PhoneNumber? _phoneNumber;
   bool _searching = false;
   WorkerDetail? _match;
 
@@ -41,9 +44,10 @@ class _WorkerAddScreenState extends State<WorkerAddScreen> {
     if (!mounted) {
       return;
     }
+    final String e164 = AuthApi.phoneNumberToE164(_phoneNumber!);
     setState(() {
       _searching = false;
-      _match = WorkersMockData.searchByPhone(_phone.text);
+      _match = WorkersMockData.searchByPhone(e164);
     });
   }
 
@@ -84,21 +88,18 @@ class _WorkerAddScreenState extends State<WorkerAddScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          TextField(
+          KaamPhoneField(
             controller: _phone,
-            keyboardType: TextInputType.phone,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp(r'[\d+\s-]')),
-            ],
+            onPhoneUpdate: (PhoneNumber phone) =>
+                setState(() => _phoneNumber = phone),
             decoration: InputDecoration(
               labelText: l10n.authPhoneHint,
-              hintText: '+977…',
-              prefixIcon: const Icon(Icons.phone_rounded),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           FilledButton(
-            onPressed: _searching || _phone.text.trim().length < 8
+            onPressed: _searching ||
+                    _phone.text.replaceAll(RegExp(r'\D'), '').length < 8
                 ? null
                 : () => _search(l10n),
             child: _searching
