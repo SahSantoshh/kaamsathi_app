@@ -205,7 +205,8 @@ class AttendanceDayScreen extends ConsumerWidget {
                   )
                 : const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (Object error, StackTrace stackTrace) =>
+                const SizedBox.shrink(),
           ),
         ],
       ),

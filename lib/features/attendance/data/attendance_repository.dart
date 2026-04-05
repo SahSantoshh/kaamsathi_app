@@ -45,14 +45,14 @@ class AttendanceRepository {
   ];
 
   Future<List<AttendanceDay>> fetchAttendanceDays(String orgId, String engagementId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     return _attendanceDays
         .where((day) => day.orgId == orgId && day.engagementId == engagementId)
         .toList();
   }
 
   Future<AttendanceDay?> fetchAttendanceDay(String dayId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     try {
       return _attendanceDays.firstWhere((day) => day.id == dayId);
     } catch (_) {
@@ -61,17 +61,17 @@ class AttendanceRepository {
   }
 
   Future<List<TimePunch>> fetchTimePunches(String dayId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     return _timePunches.where((punch) => punch.attendanceDayId == dayId).toList();
   }
 
   Future<void> addAttendanceDay(AttendanceDay day) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     _attendanceDays.add(day);
   }
 
   Future<void> updateTimePunch(TimePunch punch) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     final index = _timePunches.indexWhere((p) => p.id == punch.id);
     if (index != -1) {
       _timePunches[index] = punch;
@@ -81,7 +81,7 @@ class AttendanceRepository {
   }
 
   Future<void> lockAttendanceDay(String dayId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     final index = _attendanceDays.indexWhere((day) => day.id == dayId);
     if (index != -1) {
       _attendanceDays[index] = _attendanceDays[index].copyWith(status: 'locked');

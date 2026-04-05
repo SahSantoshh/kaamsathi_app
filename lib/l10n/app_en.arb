@@ -242,6 +242,84 @@
   "pgSiteDetail": "Site",
   "pgSiteNew": "New site",
   "pgSiteEdit": "Edit site",
+  "sitesSearchHint": "Search by name, address, or contractee",
+  "sitesEmptyTitle": "No project sites yet",
+  "sitesEmptyBody": "Add a site to track locations, contractees, and staffing for this organization.",
+  "sitesAddSite": "Add site",
+  "sitesLoadError": "Could not load project sites.",
+  "sitesNotFoundTitle": "Site not found",
+  "sitesNotFoundBody": "This project site may have been removed or you may not have access.",
+  "sitesBackToList": "Back to sites",
+  "sitesLocationSection": "Location",
+  "sitesAddressLabel": "Address",
+  "sitesContracteeSection": "Contractee",
+  "sitesContracteeNameLabel": "Name",
+  "sitesStaffingSection": "Staffing today",
+  "sitesWorkersScheduledToday": "Workers scheduled today",
+  "sitesAssignmentsToday": "Assignments today",
+  "sitesDefaultHomeWorkers": "Workers with this as home site",
+  "sitesContracteeMyself": "This site is for me",
+  "sitesContracteeOther": "Contractee is someone else",
+  "sitesContracteeHelp": "Use your account as contractee, or enter another person’s email (and optional phone) to find or create their user.",
+  "sitesContracteeEmail": "Contractee email",
+  "sitesContracteePhoneHint": "Phone (E.164, optional)",
+  "sitesContracteeFirstName": "First name (optional)",
+  "sitesContracteeMiddleName": "Middle name (optional)",
+  "sitesContracteeLastName": "Last name (optional)",
+  "sitesNameLabel": "Site name",
+  "sitesAddressHint": "Address (optional)",
+  "sitesCreateCta": "Create site",
+  "sitesSaveChanges": "Save changes",
+  "sitesCreatedSnackbar": "Site created",
+  "sitesUpdatedSnackbar": "Site updated",
+  "sitesDeletedSnackbar": "Site deleted",
+  "sitesDeleteConfirmTitle": "Delete site?",
+  "sitesDeleteConfirmBody": "This cannot be undone if the server allows deletion. Workers and payroll data tied to this site may need to be updated first.",
+  "sitesDeleteAction": "Delete",
+  "sitesUpdatedAt": "Updated",
+  "sitesCreatedAt": "Created",
+  "sitesSitePhotos": "Site photos",
+  "sitesContracteeEmailRequired": "Enter the contractee’s email",
+  "sitesPickFromContacts": "Pick from contacts",
+  "sitesPickPhoneTitle": "Numbers for {name}",
+  "@sitesPickPhoneTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sitesPickEmailTitle": "Email addresses for {name}",
+  "@sitesPickEmailTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sitesContactInvalidPhone": "Could not read the phone number from that contact.",
+  "sitesContactsPermissionTitle": "Contacts",
+  "sitesContactsPermissionDenied": "Contacts access was denied. Allow access to pick a phone number.",
+  "sitesContactsPickerError": "Could not use contacts: {message}",
+  "@sitesContactsPickerError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sitesContactsPermissionSettingsBody": "Allow contacts access in Settings to pick a phone number from someone in your address book.",
+  "sitesContactsOpenSettings": "Open settings",
+  "sitesContactNoPhones": "That contact has no phone numbers.",
+  "sitesContactsNotAvailableOnPlatform": "Contact picking is only available on Android and iOS.",
+  "sitesContactsPickerTitle": "Choose contact",
+  "sitesContactsSearchHint": "Search name, phone, email, or company",
+  "sitesContactsLoading": "Loading contacts…",
+  "sitesContactsEmptyList": "No contacts in your address book.",
+  "sitesContactsNoMatches": "No contacts match your search.",
+  "sitesContactsNoPhoneOrEmailLine": "No phone number or email on this contact",
+  "sitesContracteePhotoPreview": "Photo from contacts",
+  "sitesPhoneLabelOther": "Other",
   "pgPayPeriodsList": "Pay periods",
   "pgPayPeriodDetail": "Pay period",
   "pgPayPeriodNew": "New pay period",
@@ -267,6 +345,7 @@
   "workersSearchByPhoneTitle": "Find by phone",
   "workersSearchByPhoneSubtitle": "Search an E.164 number to link an existing user or start onboarding.",
   "workersSearchButton": "Search",
+  "workersPickFromContacts": "Pick phone from contacts",
   "workersSearchMatchTitle": "Match found",
   "workersSearchMatchSubtitle": "Review details before adding this person to the roster.",
   "workersAddToOrganization": "Add to organization",

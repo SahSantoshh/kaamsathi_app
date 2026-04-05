@@ -1318,6 +1318,348 @@ abstract class AppLocalizations {
   /// **'Edit site'**
   String get pgSiteEdit;
 
+  /// No description provided for @sitesSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, address, or contractee'**
+  String get sitesSearchHint;
+
+  /// No description provided for @sitesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No project sites yet'**
+  String get sitesEmptyTitle;
+
+  /// No description provided for @sitesEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a site to track locations, contractees, and staffing for this organization.'**
+  String get sitesEmptyBody;
+
+  /// No description provided for @sitesAddSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Add site'**
+  String get sitesAddSite;
+
+  /// No description provided for @sitesLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load project sites.'**
+  String get sitesLoadError;
+
+  /// No description provided for @sitesNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site not found'**
+  String get sitesNotFoundTitle;
+
+  /// No description provided for @sitesNotFoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This project site may have been removed or you may not have access.'**
+  String get sitesNotFoundBody;
+
+  /// No description provided for @sitesBackToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to sites'**
+  String get sitesBackToList;
+
+  /// No description provided for @sitesLocationSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get sitesLocationSection;
+
+  /// No description provided for @sitesAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get sitesAddressLabel;
+
+  /// No description provided for @sitesContracteeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Contractee'**
+  String get sitesContracteeSection;
+
+  /// No description provided for @sitesContracteeNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get sitesContracteeNameLabel;
+
+  /// No description provided for @sitesStaffingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Staffing today'**
+  String get sitesStaffingSection;
+
+  /// No description provided for @sitesWorkersScheduledToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers scheduled today'**
+  String get sitesWorkersScheduledToday;
+
+  /// No description provided for @sitesAssignmentsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignments today'**
+  String get sitesAssignmentsToday;
+
+  /// No description provided for @sitesDefaultHomeWorkers.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers with this as home site'**
+  String get sitesDefaultHomeWorkers;
+
+  /// No description provided for @sitesContracteeMyself.
+  ///
+  /// In en, this message translates to:
+  /// **'This site is for me'**
+  String get sitesContracteeMyself;
+
+  /// No description provided for @sitesContracteeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Contractee is someone else'**
+  String get sitesContracteeOther;
+
+  /// No description provided for @sitesContracteeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your account as contractee, or enter another person’s email (and optional phone) to find or create their user.'**
+  String get sitesContracteeHelp;
+
+  /// No description provided for @sitesContracteeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Contractee email'**
+  String get sitesContracteeEmail;
+
+  /// No description provided for @sitesContracteePhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (E.164, optional)'**
+  String get sitesContracteePhoneHint;
+
+  /// No description provided for @sitesContracteeFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name (optional)'**
+  String get sitesContracteeFirstName;
+
+  /// No description provided for @sitesContracteeMiddleName.
+  ///
+  /// In en, this message translates to:
+  /// **'Middle name (optional)'**
+  String get sitesContracteeMiddleName;
+
+  /// No description provided for @sitesContracteeLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name (optional)'**
+  String get sitesContracteeLastName;
+
+  /// No description provided for @sitesNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Site name'**
+  String get sitesNameLabel;
+
+  /// No description provided for @sitesAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Address (optional)'**
+  String get sitesAddressHint;
+
+  /// No description provided for @sitesCreateCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Create site'**
+  String get sitesCreateCta;
+
+  /// No description provided for @sitesSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get sitesSaveChanges;
+
+  /// No description provided for @sitesCreatedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Site created'**
+  String get sitesCreatedSnackbar;
+
+  /// No description provided for @sitesUpdatedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Site updated'**
+  String get sitesUpdatedSnackbar;
+
+  /// No description provided for @sitesDeletedSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Site deleted'**
+  String get sitesDeletedSnackbar;
+
+  /// No description provided for @sitesDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete site?'**
+  String get sitesDeleteConfirmTitle;
+
+  /// No description provided for @sitesDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone if the server allows deletion. Workers and payroll data tied to this site may need to be updated first.'**
+  String get sitesDeleteConfirmBody;
+
+  /// No description provided for @sitesDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get sitesDeleteAction;
+
+  /// No description provided for @sitesUpdatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get sitesUpdatedAt;
+
+  /// No description provided for @sitesCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get sitesCreatedAt;
+
+  /// No description provided for @sitesSitePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Site photos'**
+  String get sitesSitePhotos;
+
+  /// No description provided for @sitesContracteeEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the contractee’s email'**
+  String get sitesContracteeEmailRequired;
+
+  /// No description provided for @sitesPickFromContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from contacts'**
+  String get sitesPickFromContacts;
+
+  /// No description provided for @sitesPickPhoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Numbers for {name}'**
+  String sitesPickPhoneTitle(String name);
+
+  /// No description provided for @sitesPickEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email addresses for {name}'**
+  String sitesPickEmailTitle(String name);
+
+  /// No description provided for @sitesContactInvalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the phone number from that contact.'**
+  String get sitesContactInvalidPhone;
+
+  /// No description provided for @sitesContactsPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get sitesContactsPermissionTitle;
+
+  /// No description provided for @sitesContactsPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts access was denied. Allow access to pick a phone number.'**
+  String get sitesContactsPermissionDenied;
+
+  /// No description provided for @sitesContactsPickerError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not use contacts: {message}'**
+  String sitesContactsPickerError(String message);
+
+  /// No description provided for @sitesContactsPermissionSettingsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow contacts access in Settings to pick a phone number from someone in your address book.'**
+  String get sitesContactsPermissionSettingsBody;
+
+  /// No description provided for @sitesContactsOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get sitesContactsOpenSettings;
+
+  /// No description provided for @sitesContactNoPhones.
+  ///
+  /// In en, this message translates to:
+  /// **'That contact has no phone numbers.'**
+  String get sitesContactNoPhones;
+
+  /// No description provided for @sitesContactsNotAvailableOnPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact picking is only available on Android and iOS.'**
+  String get sitesContactsNotAvailableOnPlatform;
+
+  /// No description provided for @sitesContactsPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose contact'**
+  String get sitesContactsPickerTitle;
+
+  /// No description provided for @sitesContactsSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search name, phone, email, or company'**
+  String get sitesContactsSearchHint;
+
+  /// No description provided for @sitesContactsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading contacts…'**
+  String get sitesContactsLoading;
+
+  /// No description provided for @sitesContactsEmptyList.
+  ///
+  /// In en, this message translates to:
+  /// **'No contacts in your address book.'**
+  String get sitesContactsEmptyList;
+
+  /// No description provided for @sitesContactsNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No contacts match your search.'**
+  String get sitesContactsNoMatches;
+
+  /// No description provided for @sitesContactsNoPhoneOrEmailLine.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone number or email on this contact'**
+  String get sitesContactsNoPhoneOrEmailLine;
+
+  /// No description provided for @sitesContracteePhotoPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo from contacts'**
+  String get sitesContracteePhotoPreview;
+
+  /// No description provided for @sitesPhoneLabelOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get sitesPhoneLabelOther;
+
   /// No description provided for @pgPayPeriodsList.
   ///
   /// In en, this message translates to:
@@ -1467,6 +1809,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get workersSearchButton;
+
+  /// No description provided for @workersPickFromContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick phone from contacts'**
+  String get workersPickFromContacts;
 
   /// No description provided for @workersSearchMatchTitle.
   ///

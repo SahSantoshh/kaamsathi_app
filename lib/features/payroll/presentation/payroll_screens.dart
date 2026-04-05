@@ -400,7 +400,6 @@ class PayPeriodLockScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final PayPeriod? period = PayrollMockData.getPeriodById(orgId, periodId);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.pgPayPeriodLock)),

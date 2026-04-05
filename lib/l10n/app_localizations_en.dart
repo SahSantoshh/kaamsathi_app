@@ -667,6 +667,192 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pgSiteEdit => 'Edit site';
 
   @override
+  String get sitesSearchHint => 'Search by name, address, or contractee';
+
+  @override
+  String get sitesEmptyTitle => 'No project sites yet';
+
+  @override
+  String get sitesEmptyBody =>
+      'Add a site to track locations, contractees, and staffing for this organization.';
+
+  @override
+  String get sitesAddSite => 'Add site';
+
+  @override
+  String get sitesLoadError => 'Could not load project sites.';
+
+  @override
+  String get sitesNotFoundTitle => 'Site not found';
+
+  @override
+  String get sitesNotFoundBody =>
+      'This project site may have been removed or you may not have access.';
+
+  @override
+  String get sitesBackToList => 'Back to sites';
+
+  @override
+  String get sitesLocationSection => 'Location';
+
+  @override
+  String get sitesAddressLabel => 'Address';
+
+  @override
+  String get sitesContracteeSection => 'Contractee';
+
+  @override
+  String get sitesContracteeNameLabel => 'Name';
+
+  @override
+  String get sitesStaffingSection => 'Staffing today';
+
+  @override
+  String get sitesWorkersScheduledToday => 'Workers scheduled today';
+
+  @override
+  String get sitesAssignmentsToday => 'Assignments today';
+
+  @override
+  String get sitesDefaultHomeWorkers => 'Workers with this as home site';
+
+  @override
+  String get sitesContracteeMyself => 'This site is for me';
+
+  @override
+  String get sitesContracteeOther => 'Contractee is someone else';
+
+  @override
+  String get sitesContracteeHelp =>
+      'Use your account as contractee, or enter another person’s email (and optional phone) to find or create their user.';
+
+  @override
+  String get sitesContracteeEmail => 'Contractee email';
+
+  @override
+  String get sitesContracteePhoneHint => 'Phone (E.164, optional)';
+
+  @override
+  String get sitesContracteeFirstName => 'First name (optional)';
+
+  @override
+  String get sitesContracteeMiddleName => 'Middle name (optional)';
+
+  @override
+  String get sitesContracteeLastName => 'Last name (optional)';
+
+  @override
+  String get sitesNameLabel => 'Site name';
+
+  @override
+  String get sitesAddressHint => 'Address (optional)';
+
+  @override
+  String get sitesCreateCta => 'Create site';
+
+  @override
+  String get sitesSaveChanges => 'Save changes';
+
+  @override
+  String get sitesCreatedSnackbar => 'Site created';
+
+  @override
+  String get sitesUpdatedSnackbar => 'Site updated';
+
+  @override
+  String get sitesDeletedSnackbar => 'Site deleted';
+
+  @override
+  String get sitesDeleteConfirmTitle => 'Delete site?';
+
+  @override
+  String get sitesDeleteConfirmBody =>
+      'This cannot be undone if the server allows deletion. Workers and payroll data tied to this site may need to be updated first.';
+
+  @override
+  String get sitesDeleteAction => 'Delete';
+
+  @override
+  String get sitesUpdatedAt => 'Updated';
+
+  @override
+  String get sitesCreatedAt => 'Created';
+
+  @override
+  String get sitesSitePhotos => 'Site photos';
+
+  @override
+  String get sitesContracteeEmailRequired => 'Enter the contractee’s email';
+
+  @override
+  String get sitesPickFromContacts => 'Pick from contacts';
+
+  @override
+  String sitesPickPhoneTitle(String name) {
+    return 'Numbers for $name';
+  }
+
+  @override
+  String sitesPickEmailTitle(String name) {
+    return 'Email addresses for $name';
+  }
+
+  @override
+  String get sitesContactInvalidPhone =>
+      'Could not read the phone number from that contact.';
+
+  @override
+  String get sitesContactsPermissionTitle => 'Contacts';
+
+  @override
+  String get sitesContactsPermissionDenied =>
+      'Contacts access was denied. Allow access to pick a phone number.';
+
+  @override
+  String sitesContactsPickerError(String message) {
+    return 'Could not use contacts: $message';
+  }
+
+  @override
+  String get sitesContactsPermissionSettingsBody =>
+      'Allow contacts access in Settings to pick a phone number from someone in your address book.';
+
+  @override
+  String get sitesContactsOpenSettings => 'Open settings';
+
+  @override
+  String get sitesContactNoPhones => 'That contact has no phone numbers.';
+
+  @override
+  String get sitesContactsNotAvailableOnPlatform =>
+      'Contact picking is only available on Android and iOS.';
+
+  @override
+  String get sitesContactsPickerTitle => 'Choose contact';
+
+  @override
+  String get sitesContactsSearchHint => 'Search name, phone, email, or company';
+
+  @override
+  String get sitesContactsLoading => 'Loading contacts…';
+
+  @override
+  String get sitesContactsEmptyList => 'No contacts in your address book.';
+
+  @override
+  String get sitesContactsNoMatches => 'No contacts match your search.';
+
+  @override
+  String get sitesContactsNoPhoneOrEmailLine =>
+      'No phone number or email on this contact';
+
+  @override
+  String get sitesContracteePhotoPreview => 'Photo from contacts';
+
+  @override
+  String get sitesPhoneLabelOther => 'Other';
+
+  @override
   String get pgPayPeriodsList => 'Pay periods';
 
   @override
@@ -742,6 +928,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workersSearchButton => 'Search';
+
+  @override
+  String get workersPickFromContacts => 'Pick phone from contacts';
 
   @override
   String get workersSearchMatchTitle => 'Match found';

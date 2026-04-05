@@ -1,55 +1,79 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../domain/project_site_models.dart';
-import 'project_sites_mock_data.dart';
+import 'project_sites_api.dart';
+import 'project_sites_api_provider.dart';
 
 class ProjectSiteRepository {
-  ProjectSiteRepository();
+  ProjectSiteRepository(this._api);
 
-  final List<ProjectSite> _sites = [];
+  final ProjectSitesApi _api;
 
-  Future<List<ProjectSite>> fetchSites(String orgId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    // Initialize with mock data if empty for this demo
-    if (_sites.isEmpty) {
-      _sites.addAll(ProjectSitesMockData.sitesForOrg(orgId));
-    }
-    return _sites.where((site) => site.orgId == orgId).toList();
+  Future<List<ProjectSite>> fetchSites(String orgId) {
+    // `orgId` keys Riverpod cache; tenant is `X-Organization-Id` on [Dio].
+    return _api.listAllProjectSites();
   }
 
   Future<ProjectSite?> fetchSite(String orgId, String siteId) async {
-    await Future.delayed(const Duration(milliseconds: 300));
     try {
-      return _sites.firstWhere((site) => site.orgId == orgId && site.id == siteId);
-    } catch (_) {
-      // Fallback to mock data if not in memory yet
-      return ProjectSitesMockData.getSiteById(orgId, siteId);
+      return await _api.getProjectSite(siteId);
+    } on ProjectSitesApiException catch (e) {
+      if (e.statusCode == 404) {
+        return null;
+      }
+      rethrow;
     }
   }
 
-  Future<void> addSite(ProjectSite site) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _sites.add(site);
+  Future<ProjectSite> createSite({
+    required String orgId,
+    required String name,
+    required bool forSelf,
+    Map<String, dynamic>? contractee,
+    String? addressString,
+    Uint8List? contracteeAvatarBytes,
+  }) {
+    return _api.createProjectSite(
+      name: name,
+      forSelf: forSelf,
+      contractee: contractee,
+      addressString: addressString,
+      contracteeAvatarBytes: contracteeAvatarBytes,
+    );
   }
 
-  Future<void> updateSite(ProjectSite site) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final index = _sites.indexWhere((s) => s.id == site.id);
-    if (index != -1) {
-      _sites[index] = site;
-    }
+  Future<ProjectSite> updateSite({
+    required String orgId,
+    required ProjectSite site,
+    String? name,
+    String? addressString,
+  }) {
+    return _api.updateProjectSite(
+      site.id,
+      name: name,
+      addressString: addressString,
+    );
+  }
+
+  Future<void> deleteSite(String orgId, String siteId) {
+    return _api.deleteProjectSite(siteId);
   }
 }
 
 final projectSiteRepositoryProvider = Provider<ProjectSiteRepository>((ref) {
-  return ProjectSiteRepository();
+  return ProjectSiteRepository(ref.watch(projectSitesApiProvider));
 });
 
-final projectSitesProvider = FutureProvider.family<List<ProjectSite>, String>((ref, orgId) {
+final projectSitesProvider =
+    FutureProvider.family<List<ProjectSite>, String>((ref, orgId) {
   final repository = ref.watch(projectSiteRepositoryProvider);
   return repository.fetchSites(orgId);
 });
 
-final projectSiteProvider = FutureProvider.family<ProjectSite?, ({String orgId, String siteId})>((ref, args) {
+final projectSiteProvider = FutureProvider.family<ProjectSite?,
+    ({String orgId, String siteId})>((ref, args) {
   final repository = ref.watch(projectSiteRepositoryProvider);
   return repository.fetchSite(args.orgId, args.siteId);
 });

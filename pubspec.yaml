@@ -43,7 +43,7 @@ dependencies:
   sealed_currencies: ^3.1.0
   sealed_countries: ^3.1.0
   intl_phone_field: ^3.2.0
-
+  flutter_contacts: ^2.0.1
 
 
 
