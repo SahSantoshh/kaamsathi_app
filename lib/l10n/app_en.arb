@@ -55,6 +55,16 @@
   "authForgotPasswordNewPasswordCta": "Save new password & sign in",
   "authUsePhoneSignInCta": "Use phone sign-in",
   "authCodeSentSnackbar": "Code sent — check your messages.",
+  "authOtpResendIn": "Resend code in {seconds}s",
+  "@authOtpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpResend": "Resend code",
+  "authOtpResentSnackbar": "New code sent — check your email.",
   "authForgotResetCodeSentSnackbar": "If that account exists, we emailed a reset code. Check your inbox.",
   "authErrorNameShort": "Enter your name",
   "authPasswordMismatch": "Passwords must match",
@@ -330,9 +340,18 @@
   "pgRatingNew": "Rate organization",
   "pgReportAttendance": "Attendance report",
   "pgReportExport": "Export report",
-  "workersRosterSubtitle": "People engaged with your organization. Pull to refresh when live data is on.",
+  "workersRosterSubtitle": "Everyone engaged with this organization through an employment record. Pull to refresh.",
+  "workersExperienceLabel": "Experience",
   "workersSearchHint": "Search by name or phone",
   "workersAddWorker": "Add worker",
+  "workersAddFromSiteBanner": "Adding from site: {siteName}",
+  "@workersAddFromSiteBanner": {
+    "placeholders": {
+      "siteName": {
+        "type": "String"
+      }
+    }
+  },
   "workersContactSection": "Contact",
   "workersSkillsSection": "Skills & role",
   "workersPayoutSection": "Payout",
@@ -342,18 +361,49 @@
   "workersJoined": "Joined",
   "workersBankAccount": "Bank account",
   "workersSaveChanges": "Save changes",
-  "workersSearchByPhoneTitle": "Find by phone",
-  "workersSearchByPhoneSubtitle": "Search an E.164 number to link an existing user or start onboarding.",
+  "workersSearchByPhoneTitle": "Find by phone or email",
+  "workersSearchByPhoneSubtitle": "Search for an existing account to link and hire into this organization. If nobody matches, create a new worker. Optional: set a home project site below.",
+  "workersSearchEmailLabel": "Email",
+  "workersHomeSiteHint": "Home project site when hiring (optional)",
+  "workersHomeSiteNone": "No default site",
+  "appSearchTitle": "Search",
+  "appSearchHint": "Organizations, sites, workers…",
+  "appSearchMinChars": "Type at least 2 characters.",
+  "appSearchSectionOrgs": "Organizations",
+  "appSearchSectionSites": "Project sites",
+  "appSearchSectionWorkers": "Workers",
+  "appSearchNoResults": "No matches in your organizations, sites, or team.",
+  "dashboardSearchTooltip": "Search",
   "workersSearchButton": "Search",
+  "workersSearchNeedContact": "Enter a phone number or email for this worker.",
   "workersPickFromContacts": "Pick phone from contacts",
-  "workersSearchMatchTitle": "Match found",
-  "workersSearchMatchSubtitle": "Review details before adding this person to the roster.",
-  "workersAddToOrganization": "Add to organization",
   "workersEmptyTitle": "No workers yet",
   "workersEmptyBody": "When your team is connected, everyone engaged with this organization will appear here.",
   "workersNotFoundTitle": "Worker not found",
   "workersNotFoundBody": "This worker could not be found. Open the list and pick someone from your team.",
   "workersSnackbarSaved": "Changes saved",
-  "workersSnackbarAdded": "Worker added",
-  "workersDemoBadge": "Sample data"
+  "workersLinkToOrganization": "Add to organization",
+  "workersLinkedSnackbar": "Worker added to this organization",
+  "workersSearchUserNoWorker": "This account is registered but has no worker profile yet. Enter a display name to create one.",
+  "workersSearchOnboardNew": "No account yet with this phone or email. Enter a display name to create their worker profile.",
+  "workersSearchPickMatchTitle": "Multiple accounts match",
+  "workersSearchPickMatchSubtitle": "Choose the right person. Then add them to this organization (and optional home project site above). You can assign them to projects from scheduling after they are hired.",
+  "workersSearchMatchHasWorker": "Has a worker profile — add to this organization",
+  "workersSearchMatchNeedsProfile": "Account only — create a worker profile below",
+  "workersSearchPickMatchFirst": "Choose someone from the list first.",
+  "workersCreateWorkerCta": "Create worker",
+  "workersDisplayNameLabel": "Display name",
+  "engagementSectionTitle": "Engagement",
+  "engagementMissingForWorker": "No engagement was found for this person in this organization.",
+  "engagementStatusLabel": "Status",
+  "engagementCompensationLabel": "Compensation",
+  "engagementHomeSiteLabel": "Home project site",
+  "engagementStartsLabel": "Starts",
+  "engagementEndsLabel": "Ends",
+  "engagementOpenHub": "Open engagement",
+  "engagementShortcutsTitle": "Scheduling & payroll",
+  "engagementsListSubtitle": "Each row is one worker’s contract with this organization.",
+  "engagementsEmptyTitle": "No engagements yet",
+  "engagementsEmptyBody": "When workers are linked to this organization, their engagements appear here.",
+  "engagementDetailSubtitle": "Status, home site, and shortcuts to scheduling and payroll."
 }

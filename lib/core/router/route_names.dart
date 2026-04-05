@@ -7,6 +7,7 @@ abstract final class RouteNames {
   static const String selectOrganization = 'selectOrganization';
   static const String organizationCreate = 'organizationCreate';
   static const String home = 'home';
+  static const String appSearch = 'appSearch';
   static const String devNavigationRoutes = 'devNavigationRoutes';
   static const String settings = 'settings';
   static const String forbidden = 'forbidden';

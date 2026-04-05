@@ -42,7 +42,9 @@ String? _tenantOrgIdFromPath(String path) {
 }
 
 bool _requiresSelectedOrganization(String path) {
-  if (path == AppPaths.home || path == AppPaths.devNavigationRoutes) {
+  if (path == AppPaths.home ||
+      path == AppPaths.devNavigationRoutes ||
+      path == AppPaths.search) {
     return true;
   }
   return _tenantOrgIdFromPath(path) != null;

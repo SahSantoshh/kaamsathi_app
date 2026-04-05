@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_spacing.dart';
+import '../domain/worker_models.dart';
 
 String workerInitials(String displayName) {
   final List<String> parts =
@@ -20,26 +21,65 @@ Widget workerStatusChip(BuildContext context, String? status) {
     return const SizedBox.shrink();
   }
   final ColorScheme scheme = Theme.of(context).colorScheme;
-  final bool onLeave = status.toLowerCase().contains('leave');
+  final String lower = status.toLowerCase();
+  final bool muted = lower.contains('leave') ||
+      lower.contains('terminated') ||
+      lower.contains('offboard');
+  final bool onboarding = lower.contains('onboarding');
   return Container(
     padding: const EdgeInsets.symmetric(
       horizontal: AppSpacing.sm,
       vertical: AppSpacing.xs,
     ),
     decoration: BoxDecoration(
-      color: onLeave
-          ? scheme.secondaryContainer.withValues(alpha: 0.85)
-          : scheme.primaryContainer.withValues(alpha: 0.65),
+      color: onboarding
+          ? scheme.tertiaryContainer.withValues(alpha: 0.85)
+          : muted
+              ? scheme.secondaryContainer.withValues(alpha: 0.85)
+              : scheme.primaryContainer.withValues(alpha: 0.65),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Text(
       status,
       style: Theme.of(context).textTheme.labelSmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: onLeave
-                ? scheme.onSecondaryContainer
-                : scheme.onPrimaryContainer,
+            color: onboarding
+                ? scheme.onTertiaryContainer
+                : muted
+                    ? scheme.onSecondaryContainer
+                    : scheme.onPrimaryContainer,
           ),
+    ),
+  );
+}
+
+Widget workerListAvatar(
+  BuildContext context,
+  Worker worker, {
+  double radius = 28,
+}) {
+  final ColorScheme scheme = Theme.of(context).colorScheme;
+  final TextTheme textTheme = Theme.of(context).textTheme;
+  final String? url = worker.effectiveAvatarUrl;
+  final String label = worker.title;
+  if (url != null && url.isNotEmpty) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: scheme.primaryContainer.withValues(alpha: 0.5),
+      backgroundImage: NetworkImage(url),
+      onBackgroundImageError:
+          (Object exception, StackTrace? stackTrace) {},
+    );
+  }
+  return CircleAvatar(
+    radius: radius,
+    backgroundColor: scheme.primaryContainer.withValues(alpha: 0.7),
+    child: Text(
+      workerInitials(label),
+      style: textTheme.titleMedium?.copyWith(
+        color: scheme.onPrimaryContainer,
+        fontWeight: FontWeight.bold,
+      ),
     ),
   );
 }

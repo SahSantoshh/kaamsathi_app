@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
+import '../../../core/data/pagy_meta.dart';
 import '../../organization/data/organizations_api.dart';
 import '../domain/project_site_models.dart';
 
@@ -13,32 +14,6 @@ class ProjectSitesApiException implements Exception {
 
   @override
   String toString() => message;
-}
-
-class PagyMeta {
-  const PagyMeta({
-    required this.page,
-    required this.items,
-    required this.count,
-    required this.pages,
-  });
-
-  final int page;
-  final int items;
-  final int count;
-  final int pages;
-
-  factory PagyMeta.fromJson(Map<String, dynamic>? json) {
-    if (json == null) {
-      return const PagyMeta(page: 1, items: 0, count: 0, pages: 1);
-    }
-    return PagyMeta(
-      page: _asInt(json['page'], fallback: 1),
-      items: _asInt(json['items']),
-      count: _asInt(json['count']),
-      pages: _asInt(json['pages'], fallback: 1),
-    );
-  }
 }
 
 class ProjectSitesPage {
@@ -87,19 +62,26 @@ class ProjectSitesApi {
     }
   }
 
-  /// Loads every page until [PagyMeta.pages] (max [items] per request, cap 100).
+  /// Loads every page (max [items] per request, cap 100).
+  ///
+  /// Stops when a page returns fewer than [items] rows or is empty, so a bad
+  /// or missing `meta.pages` value cannot truncate the combined list.
   Future<List<ProjectSite>> listAllProjectSites({int itemsPerPage = 100}) async {
     final int items = itemsPerPage.clamp(1, 100);
     final List<ProjectSite> all = <ProjectSite>[];
     int page = 1;
-    int pages = 1;
-    do {
+    while (true) {
       final ProjectSitesPage chunk =
           await listProjectSites(page: page, items: items);
+      if (chunk.data.isEmpty) {
+        break;
+      }
       all.addAll(chunk.data);
-      pages = chunk.meta.pages;
+      if (chunk.data.length < items) {
+        break;
+      }
       page++;
-    } while (page <= pages);
+    }
     return all;
   }
 
@@ -277,14 +259,4 @@ class ProjectSitesApi {
       );
     }
   }
-}
-
-int _asInt(Object? v, {int fallback = 0}) {
-  if (v is int) {
-    return v;
-  }
-  if (v is num) {
-    return v.toInt();
-  }
-  return fallback;
 }

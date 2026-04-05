@@ -7,6 +7,7 @@ abstract final class AppPaths {
   static const String selectOrganization = '/select-organization';
   static const String organizationCreate = '/organizations/create';
   static const String home = '/home';
+  static const String search = '/search';
   static const String devNavigationRoutes = '/dev/routes';
   static const String settings = '/settings';
   static const String forbidden = '/forbidden';
@@ -17,7 +18,13 @@ abstract final class AppPaths {
   static String orgProfile(String orgId) => '/org/$orgId';
 
   static String orgWorkers(String orgId) => '/org/$orgId/workers';
-  static String orgWorkerAdd(String orgId) => '/org/$orgId/workers/add';
+  static String orgWorkerAdd(String orgId, {String? projectSiteId}) {
+    final String base = '/org/$orgId/workers/add';
+    if (projectSiteId == null || projectSiteId.isEmpty) {
+      return base;
+    }
+    return '$base?site=${Uri.encodeQueryComponent(projectSiteId)}';
+  }
   static String orgWorkerDetail(String orgId, String workerId) =>
       '/org/$orgId/workers/$workerId';
   static String orgWorkerEdit(String orgId, String workerId) =>

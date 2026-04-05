@@ -71,6 +71,11 @@ class HomeScreen extends ConsumerWidget {
         title: Text(l10n.pgHome),
         actions: <Widget>[
           IconButton(
+            icon: const Icon(Icons.search_rounded),
+            tooltip: l10n.dashboardSearchTooltip,
+            onPressed: () => context.push(AppPaths.search),
+          ),
+          IconButton(
             icon: const Icon(Icons.notifications_none_rounded),
             onPressed: () {}, // Add notifications if available
           ),

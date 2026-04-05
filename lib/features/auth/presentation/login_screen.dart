@@ -27,6 +27,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  static const int _otpResendCooldownSec = 90;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneOtp = TextEditingController();
   final TextEditingController _otpEmail = TextEditingController();
@@ -41,6 +43,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _otpSentEmail;
   PhoneNumber? _phoneOtpNumber;
   PhoneNumber? _loginPhoneNumber;
+  Timer? _resendCooldownTimer;
+  int _resendSecondsLeft = 0;
 
   LoginAuthMode _authMode = LoginAuthMode.password;
 
@@ -60,6 +64,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void dispose() {
+    _resendCooldownTimer?.cancel();
     _phoneOtp.dispose();
     _otpEmail.dispose();
     _otp.dispose();
@@ -67,6 +72,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _loginPhone.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  void _cancelOTPResendCooldown() {
+    _resendCooldownTimer?.cancel();
+    _resendCooldownTimer = null;
+    _resendSecondsLeft = 0;
+  }
+
+  void _startOTPResendCooldown() {
+    _resendCooldownTimer?.cancel();
+    setState(() => _resendSecondsLeft = _otpResendCooldownSec);
+    _resendCooldownTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      if (_resendSecondsLeft <= 1) {
+        t.cancel();
+        _resendCooldownTimer = null;
+        setState(() => _resendSecondsLeft = 0);
+      } else {
+        setState(() => _resendSecondsLeft -= 1);
+      }
+    });
   }
 
   String? _validateEmail(String? v, AppLocalizations l10n) {
@@ -137,8 +166,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _otpSentEmail = email;
         _otp.clear();
       });
+      _startOTPResendCooldown();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.authCodeSentSnackbar)),
+      );
+    } on AuthApiException catch (e) {
+      if (mounted) {
+        _showAuthError(e, l10n);
+      }
+    } catch (_) {
+      if (mounted) {
+        _showAuthError(Exception(), l10n);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  Future<void> _resendOtp(AppLocalizations l10n) async {
+    if (!_codeSent ||
+        _resendSecondsLeft > 0 ||
+        (_otpSentPhoneE164 == null &&
+            (_otpSentEmail == null || _otpSentEmail!.isEmpty))) {
+      return;
+    }
+    setState(() => _submitting = true);
+    try {
+      await ref.read(authApiProvider).requestOtp(
+            phoneE164: _otpSentPhoneE164,
+            email: _otpSentEmail?.isNotEmpty == true ? _otpSentEmail : null,
+          );
+      if (!mounted) {
+        return;
+      }
+      setState(() => _otp.clear());
+      _startOTPResendCooldown();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.authOtpResentSnackbar)),
       );
     } on AuthApiException catch (e) {
       if (mounted) {
@@ -304,6 +370,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     _otpSentPhoneE164 = null;
                     _otpSentEmail = null;
                     _otp.clear();
+                    _cancelOTPResendCooldown();
                   });
                   unawaited(LoginMethodPreferenceStore.save(mode));
                 },
@@ -333,15 +400,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  InputDecoration _otpIdentifierDecoration(InputDecoration base) {
+    if (!_codeSent) {
+      return base;
+    }
+    return base.copyWith(
+      disabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
   List<Widget> _phoneOtpFields(AppLocalizations l10n) {
     return <Widget>[
       KaamPhoneField(
         controller: _phoneOtp,
         onPhoneUpdate: (PhoneNumber phone) =>
             setState(() => _phoneOtpNumber = phone),
-        decoration: InputDecoration(
-          labelText: l10n.authPhoneHint,
-          helperText: l10n.authOtpPhoneOrEmailHelper,
+        decoration: _otpIdentifierDecoration(
+          InputDecoration(
+            labelText: l10n.authPhoneHint,
+            helperText: l10n.authOtpPhoneOrEmailHelper,
+          ),
         ),
         enabled: !_codeSent,
       ),
@@ -350,10 +431,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         controller: _otpEmail,
         keyboardType: TextInputType.emailAddress,
         autofillHints: const <String>[AutofillHints.email],
-        decoration: InputDecoration(
-          labelText: l10n.authEmailHintOptional,
-          prefixIcon: const Icon(Icons.alternate_email_rounded),
-          helperText: l10n.authOtpEmailPairingHelper,
+        decoration: _otpIdentifierDecoration(
+          InputDecoration(
+            labelText: l10n.authEmailHintOptional,
+            prefixIcon: const Icon(Icons.alternate_email_rounded),
+            helperText: l10n.authOtpEmailPairingHelper,
+          ),
         ),
         validator: (String? v) => _validateEmail(v, l10n),
         enabled: !_codeSent,
@@ -365,6 +448,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           length: 6,
           autofocus: true,
           label: l10n.authOtpHint,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Align(
+          alignment: Alignment.center,
+          child: _resendSecondsLeft > 0
+              ? Text(
+                  l10n.authOtpResendIn(_resendSecondsLeft),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                )
+              : TextButton(
+                  onPressed: _submitting ? null : () => _resendOtp(l10n),
+                  child: Text(l10n.authOtpResend),
+                ),
         ),
       ],
       const SizedBox(height: AppSpacing.lg),

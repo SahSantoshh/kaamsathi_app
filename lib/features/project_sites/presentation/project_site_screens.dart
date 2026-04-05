@@ -58,6 +58,17 @@ class _ProjectSitesListScreenState extends ConsumerState<ProjectSitesListScreen>
           slivers: <Widget>[
             SliverAppBar.large(
               title: Text(l10n.pgSitesList),
+              actions: <Widget>[
+                if (isManager) ...<Widget>[
+                  IconButton(
+                    tooltip: l10n.pgWorkerAdd,
+                    icon: const Icon(Icons.person_add_alt_1_rounded),
+                    onPressed: () =>
+                        context.push(AppPaths.orgWorkerAdd(widget.orgId)),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                ],
+              ],
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -900,11 +911,23 @@ class ProjectSiteDetailScreen extends ConsumerWidget {
                 actions: <Widget>[
                   if (isManager) ...<Widget>[
                     IconButton(
+                      tooltip: l10n.pgWorkerAdd,
+                      icon: const Icon(Icons.person_add_alt_1_rounded),
+                      onPressed: () => context.push(
+                        AppPaths.orgWorkerAdd(
+                          orgId,
+                          projectSiteId: siteId,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: l10n.pgSiteEdit,
                       icon: const Icon(Icons.edit_rounded),
                       onPressed: () =>
                           context.push(AppPaths.orgSiteEdit(orgId, siteId)),
                     ),
                     IconButton(
+                      tooltip: l10n.sitesDeleteAction,
                       icon: const Icon(Icons.delete_outline_rounded),
                       onPressed: () => _confirmDelete(context, ref, l10n),
                     ),
@@ -1188,6 +1211,25 @@ class ProjectSiteDetailScreen extends ConsumerWidget {
                                   ),
                                 ],
                               ),
+                              if (isManager) ...<Widget>[
+                                const SizedBox(height: AppSpacing.md),
+                                Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: FilledButton.tonalIcon(
+                                    onPressed: () => context.push(
+                                      AppPaths.orgWorkerAdd(
+                                        orgId,
+                                        projectSiteId: site.id,
+                                      ),
+                                    ),
+                                    icon: const Icon(
+                                      Icons.person_add_alt_1_rounded,
+                                      size: 20,
+                                    ),
+                                    label: Text(l10n.pgWorkerAdd),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),

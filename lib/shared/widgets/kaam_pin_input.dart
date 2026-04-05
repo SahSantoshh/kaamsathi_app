@@ -189,7 +189,13 @@ class _KaamPinInputState extends State<KaamPinInput> {
                     cursorColor: Colors.transparent,
                     showCursor: false,
                     decoration: const InputDecoration(
+                      filled: false,
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
                       isCollapsed: true,
                       contentPadding: EdgeInsets.zero,
                       counterText: '',

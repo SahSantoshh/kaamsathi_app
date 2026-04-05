@@ -9,7 +9,9 @@ import '../../../core/session/app_membership_role.dart';
 import '../../../core/session/auth_session_notifier.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/widgets.dart';
-import '../data/workers_mock_data.dart';
+import '../../engagements/data/engagements_repository.dart';
+import '../../engagements/domain/engagement_models.dart';
+import '../data/workers_repository.dart';
 import '../domain/worker_models.dart';
 import 'worker_ui_helpers.dart';
 
@@ -33,19 +35,39 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
     super.dispose();
   }
 
-  List<WorkerSummary> _filtered(AppLocalizations l10n) {
-    final List<WorkerSummary> all =
-        WorkersMockData.summariesForOrg(widget.orgId);
+  Map<String, String> _engagementStatusByWorker(List<OrgEngagement> list) {
+    final Map<String, String> m = <String, String>{};
+    for (final OrgEngagement e in list) {
+      m[e.workerId] = e.status;
+    }
+    return m;
+  }
+
+  List<Worker> _filtered(
+    List<Worker> all,
+    Map<String, String> statusByWorker,
+  ) {
     final String q = _query.text.trim().toLowerCase();
     if (q.isEmpty) {
       return all;
     }
     return all
         .where(
-          (WorkerSummary w) =>
-              w.displayName.toLowerCase().contains(q) ||
-              w.phoneE164.toLowerCase().contains(q) ||
-              (w.skillsSummary?.toLowerCase().contains(q) ?? false),
+          (Worker w) {
+            if (w.title.toLowerCase().contains(q)) {
+              return true;
+            }
+            final String? em = w.user?.email?.toLowerCase();
+            if (em != null && em.contains(q)) {
+              return true;
+            }
+            final String? sk = w.skills?.toLowerCase();
+            if (sk != null && sk.contains(q)) {
+              return true;
+            }
+            final String? st = statusByWorker[w.id]?.toLowerCase();
+            return st != null && st.contains(q);
+          },
         )
         .toList();
   }
@@ -57,29 +79,24 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isManager =
         ref.watch(authSessionProvider).role == AppMembershipRole.manager;
-    final List<WorkerSummary> items = _filtered(l10n);
+    final AsyncValue<List<Worker>> asyncWorkers =
+        ref.watch(workersListProvider(widget.orgId));
+    final AsyncValue<List<OrgEngagement>> asyncEngagements =
+        ref.watch(engagementsListProvider(widget.orgId));
 
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-          await Future<void>.delayed(const Duration(milliseconds: 600));
-          if (mounted) {
-            setState(() {});
-          }
+          ref.invalidate(workersListProvider(widget.orgId));
+          ref.invalidate(engagementsListProvider(widget.orgId));
+          await ref.read(workersListProvider(widget.orgId).future);
+          await ref.read(engagementsListProvider(widget.orgId).future);
         },
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: <Widget>[
             SliverAppBar.large(
               title: Text(l10n.pgWorkersList),
-              actions: <Widget>[
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
-                  child: Center(
-                    child: _SampleDataChip(label: l10n.workersDemoBadge),
-                  ),
-                ),
-              ],
             ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(
@@ -121,120 +138,129 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
-            if (items.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: KaamEmptyState(
-                  title: l10n.workersEmptyTitle,
-                  message: l10n.workersEmptyBody,
-                  icon: Icons.groups_outlined,
-                  actionLabel: isManager ? l10n.workersAddWorker : null,
-                  onAction: isManager
-                      ? () => context.push(AppPaths.orgWorkerAdd(widget.orgId))
-                      : null,
+            asyncWorkers.when(
+              loading: () => const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (Object e, StackTrace _) => SliverFillRemaining(
+                child: KaamErrorBanner(
+                  message: e.toString(),
+                  onRetry: () =>
+                      ref.invalidate(workersListProvider(widget.orgId)),
+                  retryLabel: l10n.retry,
                 ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      final WorkerSummary w = items[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: Material(
-                          color: scheme.surfaceContainerLow,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: scheme.outlineVariant.withValues(alpha: 0.3),
+              ),
+              data: (List<Worker> workers) {
+                final Map<String, String> statusByWorker =
+                    asyncEngagements.maybeWhen(
+                  data: _engagementStatusByWorker,
+                  orElse: () => <String, String>{},
+                );
+                final List<Worker> items = _filtered(workers, statusByWorker);
+                if (items.isEmpty) {
+                  return SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: KaamEmptyState(
+                      title: l10n.workersEmptyTitle,
+                      message: l10n.workersEmptyBody,
+                      icon: Icons.groups_outlined,
+                      actionLabel: isManager ? l10n.workersAddWorker : null,
+                      onAction: isManager
+                          ? () => context
+                              .push(AppPaths.orgWorkerAdd(widget.orgId))
+                          : null,
+                    ),
+                  );
+                }
+                return SliverPadding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final Worker w = items[index];
+                        final String? engStatus = statusByWorker[w.id];
+                        final String subtitle = w.user?.email ??
+                            (w.skills?.isNotEmpty == true ? w.skills! : '');
+                        return Padding(
+                          padding:
+                              const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: Material(
+                            color: scheme.surfaceContainerLow,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(
+                                color: scheme.outlineVariant
+                                    .withValues(alpha: 0.3),
+                              ),
                             ),
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () => context.push(
-                              AppPaths.orgWorkerDetail(widget.orgId, w.id),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Row(
-                                children: <Widget>[
-                                  CircleAvatar(
-                                    radius: 28,
-                                    backgroundColor:
-                                        scheme.primaryContainer.withValues(
-                                      alpha: 0.7,
-                                    ),
-                                    child: Text(
-                                      workerInitials(w.displayName),
-                                      style: textTheme.titleMedium?.copyWith(
-                                        color: scheme.onPrimaryContainer,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: AppSpacing.md),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          w.displayName,
-                                          style: textTheme.titleMedium
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          w.phoneE164,
-                                          style: textTheme.bodySmall?.copyWith(
-                                            color: scheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                        if (w.skillsSummary != null) ...<Widget>[
-                                          const SizedBox(height: 6),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => context.push(
+                                AppPaths.orgWorkerDetail(widget.orgId, w.id),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                child: Row(
+                                  children: <Widget>[
+                                    workerListAvatar(context, w),
+                                    const SizedBox(width: AppSpacing.md),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
                                           Text(
-                                            w.skillsSummary!,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: textTheme.bodySmall?.copyWith(
-                                              color: scheme.onSurfaceVariant,
+                                            w.title,
+                                            style: textTheme.titleMedium
+                                                ?.copyWith(
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
+                                          if (subtitle.isNotEmpty) ...<Widget>[
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              subtitle,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style:
+                                                  textTheme.bodySmall?.copyWith(
+                                                color:
+                                                    scheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ],
                                         ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: <Widget>[
+                                        workerStatusChip(context, engStatus),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Icon(
+                                          Icons.chevron_right_rounded,
+                                          color: scheme.primary
+                                              .withValues(alpha: 0.5),
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: <Widget>[
-                                      workerStatusChip(
-                                        context,
-                                        w.statusLabel,
-                                      ),
-                                      const SizedBox(height: AppSpacing.xs),
-                                      Icon(
-                                        Icons.chevron_right_rounded,
-                                        color: scheme.primary.withValues(alpha: 0.5),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                    childCount: items.length,
+                        );
+                      },
+                      childCount: items.length,
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
+            ),
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
           ],
         ),
@@ -247,31 +273,6 @@ class _WorkerListScreenState extends ConsumerState<WorkerListScreen> {
               label: Text(l10n.workersAddWorker),
             )
           : null,
-    );
-  }
-}
-
-class _SampleDataChip extends StatelessWidget {
-  const _SampleDataChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall,
-      ),
     );
   }
 }

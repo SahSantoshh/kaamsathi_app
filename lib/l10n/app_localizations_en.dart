@@ -185,6 +185,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authCodeSentSnackbar => 'Code sent — check your messages.';
 
   @override
+  String authOtpResendIn(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get authOtpResend => 'Resend code';
+
+  @override
+  String get authOtpResentSnackbar => 'New code sent — check your email.';
+
+  @override
   String get authForgotResetCodeSentSnackbar =>
       'If that account exists, we emailed a reset code. Check your inbox.';
 
@@ -884,13 +895,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workersRosterSubtitle =>
-      'People engaged with your organization. Pull to refresh when live data is on.';
+      'Everyone engaged with this organization through an employment record. Pull to refresh.';
+
+  @override
+  String get workersExperienceLabel => 'Experience';
 
   @override
   String get workersSearchHint => 'Search by name or phone';
 
   @override
   String get workersAddWorker => 'Add worker';
+
+  @override
+  String workersAddFromSiteBanner(String siteName) {
+    return 'Adding from site: $siteName';
+  }
 
   @override
   String get workersContactSection => 'Contact';
@@ -920,27 +939,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workersSaveChanges => 'Save changes';
 
   @override
-  String get workersSearchByPhoneTitle => 'Find by phone';
+  String get workersSearchByPhoneTitle => 'Find by phone or email';
 
   @override
   String get workersSearchByPhoneSubtitle =>
-      'Search an E.164 number to link an existing user or start onboarding.';
+      'Search for an existing account to link and hire into this organization. If nobody matches, create a new worker. Optional: set a home project site below.';
+
+  @override
+  String get workersSearchEmailLabel => 'Email';
+
+  @override
+  String get workersHomeSiteHint => 'Home project site when hiring (optional)';
+
+  @override
+  String get workersHomeSiteNone => 'No default site';
+
+  @override
+  String get appSearchTitle => 'Search';
+
+  @override
+  String get appSearchHint => 'Organizations, sites, workers…';
+
+  @override
+  String get appSearchMinChars => 'Type at least 2 characters.';
+
+  @override
+  String get appSearchSectionOrgs => 'Organizations';
+
+  @override
+  String get appSearchSectionSites => 'Project sites';
+
+  @override
+  String get appSearchSectionWorkers => 'Workers';
+
+  @override
+  String get appSearchNoResults =>
+      'No matches in your organizations, sites, or team.';
+
+  @override
+  String get dashboardSearchTooltip => 'Search';
 
   @override
   String get workersSearchButton => 'Search';
 
   @override
+  String get workersSearchNeedContact =>
+      'Enter a phone number or email for this worker.';
+
+  @override
   String get workersPickFromContacts => 'Pick phone from contacts';
-
-  @override
-  String get workersSearchMatchTitle => 'Match found';
-
-  @override
-  String get workersSearchMatchSubtitle =>
-      'Review details before adding this person to the roster.';
-
-  @override
-  String get workersAddToOrganization => 'Add to organization';
 
   @override
   String get workersEmptyTitle => 'No workers yet';
@@ -960,8 +1007,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workersSnackbarSaved => 'Changes saved';
 
   @override
-  String get workersSnackbarAdded => 'Worker added';
+  String get workersLinkToOrganization => 'Add to organization';
 
   @override
-  String get workersDemoBadge => 'Sample data';
+  String get workersLinkedSnackbar => 'Worker added to this organization';
+
+  @override
+  String get workersSearchUserNoWorker =>
+      'This account is registered but has no worker profile yet. Enter a display name to create one.';
+
+  @override
+  String get workersSearchOnboardNew =>
+      'No account yet with this phone or email. Enter a display name to create their worker profile.';
+
+  @override
+  String get workersSearchPickMatchTitle => 'Multiple accounts match';
+
+  @override
+  String get workersSearchPickMatchSubtitle =>
+      'Choose the right person. Then add them to this organization (and optional home project site above). You can assign them to projects from scheduling after they are hired.';
+
+  @override
+  String get workersSearchMatchHasWorker =>
+      'Has a worker profile — add to this organization';
+
+  @override
+  String get workersSearchMatchNeedsProfile =>
+      'Account only — create a worker profile below';
+
+  @override
+  String get workersSearchPickMatchFirst =>
+      'Choose someone from the list first.';
+
+  @override
+  String get workersCreateWorkerCta => 'Create worker';
+
+  @override
+  String get workersDisplayNameLabel => 'Display name';
+
+  @override
+  String get engagementSectionTitle => 'Engagement';
+
+  @override
+  String get engagementMissingForWorker =>
+      'No engagement was found for this person in this organization.';
+
+  @override
+  String get engagementStatusLabel => 'Status';
+
+  @override
+  String get engagementCompensationLabel => 'Compensation';
+
+  @override
+  String get engagementHomeSiteLabel => 'Home project site';
+
+  @override
+  String get engagementStartsLabel => 'Starts';
+
+  @override
+  String get engagementEndsLabel => 'Ends';
+
+  @override
+  String get engagementOpenHub => 'Open engagement';
+
+  @override
+  String get engagementShortcutsTitle => 'Scheduling & payroll';
+
+  @override
+  String get engagementsListSubtitle =>
+      'Each row is one worker’s contract with this organization.';
+
+  @override
+  String get engagementsEmptyTitle => 'No engagements yet';
+
+  @override
+  String get engagementsEmptyBody =>
+      'When workers are linked to this organization, their engagements appear here.';
+
+  @override
+  String get engagementDetailSubtitle =>
+      'Status, home site, and shortcuts to scheduling and payroll.';
 }

@@ -424,6 +424,24 @@ abstract class AppLocalizations {
   /// **'Code sent — check your messages.'**
   String get authCodeSentSnackbar;
 
+  /// No description provided for @authOtpResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String authOtpResendIn(int seconds);
+
+  /// No description provided for @authOtpResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get authOtpResend;
+
+  /// No description provided for @authOtpResentSnackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'New code sent — check your email.'**
+  String get authOtpResentSnackbar;
+
   /// No description provided for @authForgotResetCodeSentSnackbar.
   ///
   /// In en, this message translates to:
@@ -1723,8 +1741,14 @@ abstract class AppLocalizations {
   /// No description provided for @workersRosterSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'People engaged with your organization. Pull to refresh when live data is on.'**
+  /// **'Everyone engaged with this organization through an employment record. Pull to refresh.'**
   String get workersRosterSubtitle;
+
+  /// No description provided for @workersExperienceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Experience'**
+  String get workersExperienceLabel;
 
   /// No description provided for @workersSearchHint.
   ///
@@ -1737,6 +1761,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add worker'**
   String get workersAddWorker;
+
+  /// No description provided for @workersAddFromSiteBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding from site: {siteName}'**
+  String workersAddFromSiteBanner(String siteName);
 
   /// No description provided for @workersContactSection.
   ///
@@ -1795,14 +1825,80 @@ abstract class AppLocalizations {
   /// No description provided for @workersSearchByPhoneTitle.
   ///
   /// In en, this message translates to:
-  /// **'Find by phone'**
+  /// **'Find by phone or email'**
   String get workersSearchByPhoneTitle;
 
   /// No description provided for @workersSearchByPhoneSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Search an E.164 number to link an existing user or start onboarding.'**
+  /// **'Search for an existing account to link and hire into this organization. If nobody matches, create a new worker. Optional: set a home project site below.'**
   String get workersSearchByPhoneSubtitle;
+
+  /// No description provided for @workersSearchEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get workersSearchEmailLabel;
+
+  /// No description provided for @workersHomeSiteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Home project site when hiring (optional)'**
+  String get workersHomeSiteHint;
+
+  /// No description provided for @workersHomeSiteNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No default site'**
+  String get workersHomeSiteNone;
+
+  /// No description provided for @appSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get appSearchTitle;
+
+  /// No description provided for @appSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizations, sites, workers…'**
+  String get appSearchHint;
+
+  /// No description provided for @appSearchMinChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Type at least 2 characters.'**
+  String get appSearchMinChars;
+
+  /// No description provided for @appSearchSectionOrgs.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizations'**
+  String get appSearchSectionOrgs;
+
+  /// No description provided for @appSearchSectionSites.
+  ///
+  /// In en, this message translates to:
+  /// **'Project sites'**
+  String get appSearchSectionSites;
+
+  /// No description provided for @appSearchSectionWorkers.
+  ///
+  /// In en, this message translates to:
+  /// **'Workers'**
+  String get appSearchSectionWorkers;
+
+  /// No description provided for @appSearchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches in your organizations, sites, or team.'**
+  String get appSearchNoResults;
+
+  /// No description provided for @dashboardSearchTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get dashboardSearchTooltip;
 
   /// No description provided for @workersSearchButton.
   ///
@@ -1810,29 +1906,17 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get workersSearchButton;
 
+  /// No description provided for @workersSearchNeedContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a phone number or email for this worker.'**
+  String get workersSearchNeedContact;
+
   /// No description provided for @workersPickFromContacts.
   ///
   /// In en, this message translates to:
   /// **'Pick phone from contacts'**
   String get workersPickFromContacts;
-
-  /// No description provided for @workersSearchMatchTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Match found'**
-  String get workersSearchMatchTitle;
-
-  /// No description provided for @workersSearchMatchSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Review details before adding this person to the roster.'**
-  String get workersSearchMatchSubtitle;
-
-  /// No description provided for @workersAddToOrganization.
-  ///
-  /// In en, this message translates to:
-  /// **'Add to organization'**
-  String get workersAddToOrganization;
 
   /// No description provided for @workersEmptyTitle.
   ///
@@ -1864,17 +1948,149 @@ abstract class AppLocalizations {
   /// **'Changes saved'**
   String get workersSnackbarSaved;
 
-  /// No description provided for @workersSnackbarAdded.
+  /// No description provided for @workersLinkToOrganization.
   ///
   /// In en, this message translates to:
-  /// **'Worker added'**
-  String get workersSnackbarAdded;
+  /// **'Add to organization'**
+  String get workersLinkToOrganization;
 
-  /// No description provided for @workersDemoBadge.
+  /// No description provided for @workersLinkedSnackbar.
   ///
   /// In en, this message translates to:
-  /// **'Sample data'**
-  String get workersDemoBadge;
+  /// **'Worker added to this organization'**
+  String get workersLinkedSnackbar;
+
+  /// No description provided for @workersSearchUserNoWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is registered but has no worker profile yet. Enter a display name to create one.'**
+  String get workersSearchUserNoWorker;
+
+  /// No description provided for @workersSearchOnboardNew.
+  ///
+  /// In en, this message translates to:
+  /// **'No account yet with this phone or email. Enter a display name to create their worker profile.'**
+  String get workersSearchOnboardNew;
+
+  /// No description provided for @workersSearchPickMatchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple accounts match'**
+  String get workersSearchPickMatchTitle;
+
+  /// No description provided for @workersSearchPickMatchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the right person. Then add them to this organization (and optional home project site above). You can assign them to projects from scheduling after they are hired.'**
+  String get workersSearchPickMatchSubtitle;
+
+  /// No description provided for @workersSearchMatchHasWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'Has a worker profile — add to this organization'**
+  String get workersSearchMatchHasWorker;
+
+  /// No description provided for @workersSearchMatchNeedsProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Account only — create a worker profile below'**
+  String get workersSearchMatchNeedsProfile;
+
+  /// No description provided for @workersSearchPickMatchFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose someone from the list first.'**
+  String get workersSearchPickMatchFirst;
+
+  /// No description provided for @workersCreateWorkerCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Create worker'**
+  String get workersCreateWorkerCta;
+
+  /// No description provided for @workersDisplayNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get workersDisplayNameLabel;
+
+  /// No description provided for @engagementSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Engagement'**
+  String get engagementSectionTitle;
+
+  /// No description provided for @engagementMissingForWorker.
+  ///
+  /// In en, this message translates to:
+  /// **'No engagement was found for this person in this organization.'**
+  String get engagementMissingForWorker;
+
+  /// No description provided for @engagementStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get engagementStatusLabel;
+
+  /// No description provided for @engagementCompensationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Compensation'**
+  String get engagementCompensationLabel;
+
+  /// No description provided for @engagementHomeSiteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Home project site'**
+  String get engagementHomeSiteLabel;
+
+  /// No description provided for @engagementStartsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts'**
+  String get engagementStartsLabel;
+
+  /// No description provided for @engagementEndsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends'**
+  String get engagementEndsLabel;
+
+  /// No description provided for @engagementOpenHub.
+  ///
+  /// In en, this message translates to:
+  /// **'Open engagement'**
+  String get engagementOpenHub;
+
+  /// No description provided for @engagementShortcutsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduling & payroll'**
+  String get engagementShortcutsTitle;
+
+  /// No description provided for @engagementsListSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Each row is one worker’s contract with this organization.'**
+  String get engagementsListSubtitle;
+
+  /// No description provided for @engagementsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No engagements yet'**
+  String get engagementsEmptyTitle;
+
+  /// No description provided for @engagementsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'When workers are linked to this organization, their engagements appear here.'**
+  String get engagementsEmptyBody;
+
+  /// No description provided for @engagementDetailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Status, home site, and shortcuts to scheduling and payroll.'**
+  String get engagementDetailSubtitle;
 }
 
 class _AppLocalizationsDelegate

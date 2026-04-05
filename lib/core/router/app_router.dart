@@ -12,6 +12,7 @@ import '../../features/calendar/presentation/calendar_screen.dart';
 import '../../features/commission_sales/presentation/commission_sale_screens.dart';
 import '../../features/engagements/presentation/engagement_screens.dart';
 import '../../features/forbidden/presentation/forbidden_screen.dart';
+import '../../features/home/presentation/app_search_screen.dart';
 import '../../features/home/presentation/dev_navigation_routes_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/organization/presentation/org_profile_screen.dart';
@@ -102,6 +103,13 @@ final Provider<GoRouter> goRouterProvider = Provider<GoRouter>((Ref ref) {
         },
       ),
       GoRoute(
+        path: AppPaths.search,
+        name: AppSearchScreen.name,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AppSearchScreen();
+        },
+      ),
+      GoRoute(
         path: AppPaths.devNavigationRoutes,
         name: DevNavigationRoutesScreen.name,
         builder: (BuildContext context, GoRouterState state) {
@@ -148,7 +156,10 @@ final Provider<GoRouter> goRouterProvider = Provider<GoRouter>((Ref ref) {
         path: '/org/:orgId/workers/add',
         name: WorkerAddScreen.name,
         builder: (BuildContext context, GoRouterState state) {
-          return WorkerAddScreen(orgId: state.pathParameters['orgId']!);
+          return WorkerAddScreen(
+            orgId: state.pathParameters['orgId']!,
+            projectSiteId: state.uri.queryParameters['site'],
+          );
         },
       ),
       GoRoute(
